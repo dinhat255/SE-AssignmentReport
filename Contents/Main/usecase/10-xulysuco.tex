@@ -1,0 +1,39 @@
+\begin{center}
+    \begin{tabular}{|m{2.5cm}|m{13cm}|}
+    \hline
+        ID Use-case  & UC010 \\ 
+        Name Use-case & Xử lý sự cố tại chỗ \\ 
+    \hline
+        Actors & Nhân viên, quản trị viên \\
+    \hline
+        Description & Giúp nhân viên cập nhật những sự cố, lỗi lên hệ thống để quản lý, kiểm soát. \\
+    \hline
+        Trigger & Nhân viên chọn phần báo cáo sự cố. \\
+    \hline
+        Preconditions & 
+        1. Nhân viên trong ca làm đã đăng nhập thành công vào hệ thống.
+        
+        2. Hệ thống đang hoạt động ổn định.
+        
+        3. Có kết nối Internet để kết nối với hệ thống. \\
+    \hline
+        Post conditions & Hệ thống ghi nhận lỗi và tiến hành gửi yêu cầu sửa chữa đến quản trị viên nếu đó là lỗi thiết bị. \\
+    \hline
+        Normal flow & 
+        1. Nhân viên truy cập vào hệ thống để gửi báo cáo sự cố.
+        
+        2. Nhân viên chọn loại sự cố: sự cố thiết bị (cổng, cảm biến...), sự cố tại chỗ (xe ngã đổ...).
+        
+        3. Hệ thống hiện hộp thoại mô tả sự cố.
+        
+        4. Nhân viên nhấn vào nút gửi sau khi đã mô tả chi tiết sự cố.
+        
+        5. Hệ thống ghi nhận báo cáo vào cơ sở dữ liệu, hiển thị “Gửi yêu cầu thành công”. \\
+    \hline
+        Alternative flow & - \\ 
+    \hline
+        Exception flow & 
+        - Tại bước 5, nếu gửi không thành công, hệ thống sẽ hiện thị thông báo “Gửi yêu cầu thất bại, vui lòng thử lại sau” và giữ nguyên thông tin điền của nhân viên. \\
+    \hline
+    \end{tabular}
+\end{center}

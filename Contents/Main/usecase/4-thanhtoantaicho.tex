@@ -1,0 +1,93 @@
+\begin{center}
+    \begin{tabular}{|m{2.5cm}|m{13cm}|}
+    \hline
+        ID Use-case  & UC004 \\ 
+        Name Use-case & Thanh toán tại chỗ \\ 
+    \hline
+        Actors & Người dùng nội bộ, khách vãng lai, nhân viên, \\
+    \hline
+        Description & gười dùng thanh toán phí gửi xe trực tiếp tại bãi xe khi rời bãi. Hệ thống tính phí dựa trên thông tin phiên gửi xe và chính sách giá hiện hành.\\
+    \hline
+        Trigger & Người dùng quẹt thẻ tại cổng ra của bãi xe.\\
+    \hline
+        Preconditions & 
+        1. Người dùng đã có một phiên gửi xe hợp lệ trong hệ thống.
+        
+        2. Thông tin phiên gửi xe đã được ghi nhận khi vào bãi.
+
+        3. Hệ thống có thể truy xuất dữ liệu phiên gửi xe.
+        
+        4. Dịch vụ HCMUT\_SSO đang hoạt động bình thường.\\
+    \hline
+        Post conditions & 
+        1. Phí gửi xe được thanh toán thành công.
+        
+        2. Phiên gửi xe được đóng trong hệ thống.
+        
+        3. Cổng ra được mở cho phép người dùng rời bãi xe.
+        
+        4. Thông tin giao dịch được lưu vào hệ thống để phục vụ thống kê và báo cáo.\\
+    \hline
+        Normal flow & 
+        1. Người dùng quẹt thẻ tại cổng ra của bãi xe.
+        
+        2. Hệ thống xác định phiên gửi xe tương ứng với thẻ.
+        
+        3. Hệ thống tính phí gửi xe dựa trên:
+
+            - Thời điểm vào bãi
+
+            - Thời điểm ra bãi
+
+            - hính sách giá hiện hành.
+        
+        4. Hệ thống hiển thị số tiền cần thanh toán.
+        
+        5. Người dùng thực hiện thanh toán tiền  tại chỗ.
+        
+        6. Nhân viên bãi xe xác nhận thanh toán trong hệ thống.
+        
+        7. Hệ thống đóng phiên gửi xe.
+        
+        8. Cổng ra được mở để người dùng rời bãi.\\
+    \hline
+        Alternative flow & 
+       \textbf{Alternative 1:} Người dùng nội bộ có gói trả trước.
+
+        1. Hệ thống phát hiện người dùng có gói gửi xe trả trước còn hiệu lực.
+
+        2. Hệ thống không yêu cầu thanh toán.
+
+        3. Phiên gửi xe được đóng.
+
+        4. Cổng ra được mở.
+
+         \textbf{Alternative 2:} Thanh toán bằng phương thức điện tử tại quầy.
+
+        1. Người dùng chọn thanh toán bằng QR.
+
+        2. Hệ thống xác nhận giao dịch thành công.
+
+        3. Hệ thống cập nhật trạng thái thanh toán.
+
+        4. Cổng ra được mở. 
+        \\ 
+    \hline
+    \end{tabular}
+\end{center}
+\begin{center}
+    \begin{tabular}{|m{2.5cm}|m{13cm}|}
+    \hline
+        Exception flow & 
+        \textbf{Exception 1:} Không tìm thấy phiên gửi xe.
+
+        1. Hệ thống không tìm thấy phiên gửi xe tương ứng với thẻ.
+
+        2. Hệ thống thông báo lỗi cho nhân viên bãi xe.
+
+        3. Nhân viên thực hiện xử lý sự cố tại chỗ.
+    
+        \\
+    \hline
+    \end{tabular}
+\end{center}

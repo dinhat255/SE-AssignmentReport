@@ -1,0 +1,380 @@
+\section{Task 1}
+
+\subsection{\textbf{Phân tích ngữ cảnh}}
+\subsubsection{Mô tả chi tiết dự án}
+\begin{center}
+    \textbf{Hệ thống Quản lý Bãi đỗ xe Thông minh cho Khuôn viên Trường Đại học} 
+\end{center}
+
+
+$\noindent\hspace*{1cm}$ Trường Đại học Bách Khoa – Đại học Quốc gia TP. Hồ Chí Minh (HCMUT) mỗi ngày phải phục 
+vụ một khối lượng lớn hoạt động gửi xe, bao gồm sinh viên đại học, học viên cao học, nghiên cứu sinh, 
+giảng viên, cán bộ – nhân viên và khách vãng lai. Với mật độ phương tiện ngày càng tăng trong khi 
+năng lực bãi đỗ xe có hạn, công tác quản lý hiện nay đang đối mặt với nhiều thách thức như ùn tắc tại 
+các cổng ra vào, việc khai thác không hiệu quả các chỗ đậu xe, thiếu khả năng quan sát tình trạng chỗ 
+trống theo thời gian thực, cũng như việc quản lý phí gửi xe còn phân tán và thiếu đồng bộ. Để giải 
+quyết các vấn đề này, nhà trường có kế hoạch xây dựng một Hệ thống Quản lý Bãi đỗ xe Thông minh, 
+ứng dụng các công nghệ Internet vạn vật (IoT) cùng với các nguyên lý hiện đại của công nghệ phần 
+mềm. Hệ thống hướng tới việc hỗ trợ kiểm soát ra vào tự động, giám sát tình trạng bãi đỗ xe theo thời 
+gian thực, điều hướng giao thông nội bộ một cách linh hoạt và tích hợp cơ chế tính phí – thanh toán, 
+đồng thời phải hoạt động ổn định trong các điều kiện thực tế như số lượng người dùng lớn, kết nối 
+không liên tục và sự đa dạng về nhóm người sử dụng. 
+
+$\noindent\hspace*{1cm}$ Hệ thống được đề xuất phải hỗ trợ nhiều nhóm người dùng khác nhau, bao gồm người học 
+(sinh viên, học viên cao học và nghiên cứu sinh), giảng viên, cán bộ – nhân viên và khách tạm thời. 
+Các thành viên của trường sử dụng thẻ định danh chính thức để ra vào bãi xe, thẻ này được tích hợp 
+với hạ tầng công nghệ của trường nhằm cho phép ghi nhận tự động các lượt vào và ra. Hoạt động gửi 
+xe của người học được hệ thống tổng hợp theo một chu kỳ thanh toán xác định trước, sau đó hệ thống 
+tự động tính toán phí tương ứng và khởi tạo yêu cầu thanh toán thông qua BKPay, nền tảng thanh toán 
+nội bộ của nhà trường. Quyền lợi gửi xe và chính sách giá đối với giảng viên và cán bộ có thể khác 
+nhau tùy theo quy định của từng thời kỳ và cần được cấu hình bởi các quản trị viên có thẩm quyền. 
+Bên cạnh các người dùng đã được xác thực, hệ thống cũng phải hỗ trợ khách vãng lai và các trường 
+hợp ngoại lệ, chẳng hạn như người dùng tạm thời không mang theo thẻ định danh. Trong những tình 
+huống này, hệ thống cung cấp cơ chế truy cập tạm thời tại cổng vào, cho phép phát hành vé gửi xe và 
+quản lý các phiên gửi xe độc lập với hệ thống xác thực tập trung. 
+
+$\noindent\hspace*{1cm}$ Dưới góc độ IoT, hạ tầng bãi đỗ xe bao gồm nhiều chỗ đậu, trong đó mỗi chỗ được gắn với một cảm biến có nhiệm vụ phát hiện trạng thái có xe hoặc trống. Dữ liệu từ các cảm biến được thu thập 
+và truyền về hệ thống trung tâm thông qua các cổng IoT cục bộ bằng các giao thức truyền thông tiêu 
+chuẩn. Hệ thống cần duy trì được cái nhìn gần thời gian thực về tình trạng chỗ đậu xe, đồng thời có 
+khả năng chịu lỗi trước các sự cố như cảm biến hỏng, mất kết nối gateway, hoặc dữ liệu bị trễ hay 
+không nhất quán. Để cải thiện luồng giao thông và trải nghiệm người dùng trong khuôn viên trường, 
+hệ thống phải hỗ trợ các cơ chế điều hướng tự động thông qua các bảng hiển thị điện tử được lắp đặt 
+tại cổng bãi xe và các nút giao quan trọng. Các bảng này hiển thị động trạng thái bãi xe như còn chỗ, 
+gần đầy hoặc hết chỗ, và có thể cung cấp thông tin chỉ dẫn tới các khu vực đỗ xe thay thế dựa trên dữ 
+liệu thời gian thực của hệ thống. 
+Hệ thống bãi đỗ xe thông minh phải được tích hợp với hạ tầng công nghệ hiện có của HCMUT. 
+Việc xác thực đối với các thành viên trong trường được thực hiện thông qua HCMUT\_SSO, trong khi 
+thông tin cá nhân và vai trò người dùng được đồng bộ từ HCMUT\_DATACORE theo cơ chế chỉ đọc 
+nhằm đảm bảo tính nhất quán và an toàn dữ liệu. Cơ chế phân quyền dựa trên vai trò phải được áp 
+dụng để hỗ trợ các trách nhiệm vận hành khác nhau, bao gồm người dùng cuối, nhân viên vận hành 
+bãi xe và quản trị viên hệ thống. Tất cả các hoạt động gửi xe và giao dịch tài chính phải được ghi nhận 
+đầy đủ để đảm bảo khả năng truy vết, phục vụ công tác kiểm tra, thống kê và báo cáo. 
+
+
+\subsubsection{Mục tiêu dự án}
+Để giải quyết các vấn đề trên, Hệ thống Quản lý Bãi đỗ xe Thông minh cho Khuôn viên Trường Đại học được đề xuất nhằm:
+\begin{enumerate}
+    \item Tự động hóa quy trình gửi xe
+    \item Giảm thời gian chờ tại cổng
+    \item Cung cấp thông tin thời gian thực về trạng thái bãi xe
+    \item Đảm bảo tính chính xác trong tính phí
+    \item Hỗ trợ thống kê và phân tích dữ liệu
+\end{enumerate}
+
+Hệ thống được tích hợp với các hệ thống bên ngoài như:
+
+\begin{itemize}
+    \item HCMUT\_SSO (xác thực người dùng nội bộ)
+    \item HCMUT\_DataCore (đồng bộ dữ liệu người dùng)
+    \item BKPay (xử lý thanh toán)
+    \item IoT Gateway (cung cấp dữ liệu cảm biến chỗ đỗ)
+\end{itemize}
+Định hướng mở rộng trong tương lai
+
+Trong tương lai, hệ thống có thể tích hợp AI để:
+\begin{itemize}
+    \item Nhận diện biển số tự động.
+    \item Dự đoán tình trạng bãi xe.
+    \item Áp dụng chính sách giá linh hoạt.
+    \item Phát hiện bất thường trong vận hành.
+\end{itemize}
+
+\subsubsection{Các bên liên quan (stakeholder) \& lợi ích của các bên liên quan}
+
+
+\ssssection{Người dùng nội bộ (Internal Users)}
+
+Bao gồm sinh viên, giảng viên và cán bộ sử dụng bãi xe trong khuôn viên trường.
+
+\textbf{Vai trò:}
+\begin{itemize}
+    \item Sử dụng bãi xe để gửi và lấy xe
+    \item Thực hiện thanh toán phí gửi xe
+    \item Kiểm tra tình trạng chỗ đỗ trước khi vào bãi
+\end{itemize}
+
+\textbf{Lợi ích:}
+\begin{itemize}
+    \item Quy trình ra/vào bãi xe nhanh chóng và thuận tiện
+    \item Thanh toán phí gửi xe dễ dàng
+    \item Có thông tin chính xác về số lượng chỗ đỗ còn trống
+\end{itemize}
+
+\ssssection{Khách vãng lai (Visitors)}
+
+Bao gồm những người không thuộc hệ thống nội bộ nhưng có nhu cầu gửi xe trong thời gian ngắn.
+
+\textbf{Vai trò:}
+\begin{itemize}
+    \item Sử dụng bãi xe trong thời gian ngắn
+    \item Thanh toán phí gửi xe trực tiếp tại bãi
+\end{itemize}
+
+\textbf{Lợi ích:}
+\begin{itemize}
+    \item Quy trình sử dụng đơn giản và dễ tiếp cận
+    \item Không yêu cầu đăng nhập hệ thống
+    \item Thanh toán nhanh chóng và thuận tiện
+\end{itemize}
+
+\ssssection{ Nhân viên(Parking Operators)}
+
+Là những người trực tiếp quản lý và vận hành bãi xe.
+
+\textbf{Vai trò:}
+\begin{itemize}
+    \item Giám sát hoạt động của bãi xe
+    \item Xử lý các sự cố phát sinh trong quá trình vận hành
+    \item Hỗ trợ người dùng khi cần thiết
+\end{itemize}
+
+\textbf{Lợi ích:}
+\begin{itemize}
+    \item Hệ thống vận hành ổn định và đáng tin cậy
+    \item Có giao diện giám sát trực quan để theo dõi tình trạng bãi xe
+    \item Công cụ hỗ trợ xử lý sự cố nhanh chóng
+\end{itemize}
+
+\ssssection{ Quản trị viên (Administrators)}
+
+Là những người chịu trách nhiệm quản lý và cấu hình hệ thống.
+
+\textbf{Vai trò:}
+\begin{itemize}
+    \item Cấu hình chính sách giá và quyền lợi gửi xe
+    \item Quản lý dữ liệu và hoạt động của hệ thống
+    \item Theo dõi, tổng hợp và xuất báo cáo
+\end{itemize}
+
+\textbf{Lợi ích:}
+\begin{itemize}
+    \item Khả năng cấu hình hệ thống linh hoạt
+    \item Dữ liệu thống kê chính xác và dễ truy xuất
+    \item Đảm bảo tính bảo mật và an toàn của hệ thống
+\end{itemize}
+
+\ssssection{Hệ thống bên ngoài (External Systems)}
+
+Các hệ thống tích hợp để hỗ trợ hoạt động của hệ thống bãi xe thông minh.
+
+\textbf{Vai trò:}
+\begin{itemize}
+    \item \textbf{HCMUT\_SSO}: Xác thực danh tính người dùng nội bộ
+    \item \textbf{HCMUT\_DataCore}: Đồng bộ và cung cấp thông tin người dùng
+    \item \textbf{BKPay}: Xử lý các giao dịch thanh toán
+    \item \textbf{IoT Gateway}: Cung cấp dữ liệu từ cảm biến về trạng thái chỗ đỗ
+\end{itemize}
+
+\textbf{Lợi ích:}
+\begin{itemize}
+    \item Tăng khả năng tích hợp và tự động hóa hệ thống
+    \item Đảm bảo dữ liệu được đồng bộ và cập nhật liên tục
+    \item Hỗ trợ vận hành hệ thống bãi xe hiệu quả và chính xác
+\end{itemize}
+\subsubsection{Phạm vi dự án}
+\begin{enumerate}
+
+\item \textbf{Quản lý người dùng và phân quyền:}
+\begin{itemize}
+    \item Xác thực người dùng nội bộ thông qua HCMUT\_SSO.
+    \item Phân quyền truy cập theo vai trò: Người dùng nội bộ / Nhân viên / Quản trị viên.
+    \item Quản lý thông tin người dùng và quyền lợi gửi xe.
+\end{itemize}
+
+\item \textbf{Quản lý hoạt động gửi xe:}
+\begin{itemize}
+    \item Hỗ trợ quẹt thẻ nội bộ khi vào/ra bãi xe.
+    \item Hỗ trợ quẹt thẻ khách vãng lai.
+    \item Tự động ghi nhận thời gian vào và ra.
+    \item Kiểm tra và điều hướng trạng thái bãi xe theo thời gian thực.
+\end{itemize}
+
+\item \textbf{Quản lý thanh toán:}
+\begin{itemize}
+    \item Thanh toán tại chỗ đối với khách vãng lai.
+    \item Thanh toán trả trước thông qua hệ thống tích hợp (BKPay).
+    \item Tính phí tự động dựa trên chính sách giá hiện hành.
+\end{itemize}
+
+\item \textbf{Quản lý chính sách và vận hành hệ thống:}
+\begin{itemize}
+    \item Cấu hình chính sách giá và quyền lợi gửi xe.
+    \item Giám sát và đồng bộ dữ liệu với hệ thống bên ngoài (HCMUT\_DataCore, IoT Gateway).
+    \item Thống kê và xuất báo cáo doanh thu, lượt gửi xe.
+    \item Xử lý sự cố tại chỗ và ghi nhận lịch sử thay dổi hệ thống.
+\end{itemize}
+
+\newpage  
+\subsection{\textbf{Phân tích yêu cầu}}
+
+\subsubsection{Yêu Cầu Chức Năng}
+
+
+
+
+\ssssection{\textbf{Yêu cầu chức năng phi tương tác}}
+\begin{enumerate}
+    \item [-] Hệ thống phải tự động điều chỉnh giá tiền phù hợp với thời gian thực (trước 18h là 2000đ, sau 18h là 3000đ).
+    \item [-] Hệ thống phải tự động cập nhật trạng thái chỗ đậu xe dựa vào các cảm biến trong dưới 2 giây.
+    \item [-] Hệ thống phải tự động ghi log và sao lưu lại dữ liệu mỗi 24h.
+    \item [-] Hệ thống phải tự động phát hiện cảm biến không gửi dữ liệu trong không quá 5 phút.
+    \item [-] Hệ thống phải tự động tạo báo cáo (Tỉ lệ đậu xe, số lượt sử dụng hàng ngày,...).
+\end{enumerate}
+
+\subsubsection{Yêu Cầu Phi Chức Năng}
+
+
+\ssssection{\textbf{Hiệu năng (Performance)}}
+\begin{enumerate}
+    \item [-] Hệ thống phải xử lí yêu cầu của các phương tiện (vào/ra) trong không quá 2 giây.
+    \item [-] Trạng thái bãi xe phải được cập nhật nhanh chóng và liên tục từ các cảm biến trong dưới 3 giây.
+    \item [-] Hệ thống phải có khả năng hỗ trợ xử lý tối thiểu 300 người dùng đồng thời mà không làm giảm hiệu năng hệ thống.
+\end{enumerate}
+\ssssection{\textbf{Tính sẵn sàng và độ tin cậy (Availability \& Reliability)}}
+\begin{enumerate}
+    \item [-] Hệ thống phải luôn luôn hoạt động và ổn định 24/7, thời gian ngừng hoạt động phải không quá 1\%/tháng.
+    \item [-] Hệ thống phải vẫn hoạt động ổn định khi có 1 hoặc nhiều cảm biến bị lỗi và thời gian phát hiện lỗi phải dưới 5 phút.
+    \item [-] Tất cả dữ liệu ra/vào của phương tiện và thông tin người điều khiển phải được sao lưu tự động mỗi 30 phút.
+\end{enumerate}
+\ssssection{\textbf{Tính bảo mật (Security)}}
+\begin{enumerate}
+    \item [-] Người dùng phải đăng nhập thông qua hệ thống SSO của trường.
+    \item [-] Tất cả thông tin đăng nhập và dữ liệu quan trọng phải được mã hóa bằng HTTPS/TLS.
+    \item [-] Chỉ quản trị viên mới có quyền truy cập quyền quản trị hệ thống.
+    \item [-] Tự động đăng xuất người dùng sau 30 phút không hoạt động.
+\end{enumerate}
+\ssssection{\textbf{Tính khả dụng và mở rộng (Scalability \& Maintainability)}}
+\begin{enumerate}
+    \item [-] Hệ thống phải hỗ trợ mở rộng tối thiểu 500 chỗ đậu xe cho bãi xe.
+    \item [-] Hỗ trợ tích hợp thêm cảm biến mới mà không cần sửa toàn bộ hệ thống.
+    \item [-] Mã nguồn phải được tổ chức rõ ràng, tuân thủ các chuẩn lập trình và có tài liệu hướng dẫn để thuận tiện cho việc bảo trì và xử lí các lỗi.
+\end{enumerate}
+\ssssection{\textbf{Tính thân thiện (Usability)}}
+\begin{enumerate}
+    \item [-] Giao diện phải trực quan, hiển thị đầy đủ trạng thái của bãi xe giúp cho người dùng dễ dàng xác định được chỗ trống trong dưới 30 giây.
+    \item [-] Hỗ trợ đa ngôn ngữ (Tiếng Việt, Tiếng Anh, Tiếng Trung,...) để mở rộng tệp người dùng.
+\end{enumerate}
+\ssssection{\textbf{Tính tương thích (Compatibility)}}
+\begin{enumerate}
+    \item [-] Hệ thống có thể được truy cập trên nhiều trình duyệt web khác nhau (Chrome, FireFox,...) và trên thiết bị di động.
+    \item [-] Hệ thống phải tương thích với hệ thống thanh toán BKPay với tỉ lệ gửi yêu cầu thanh toán thành công trên 99\%.
+    \item [-] Hệ thống phải tích hợp được với hệ thống HCMUT SSO với tỉ lệ đăng nhập thành công trên 99\%.
+    \item [-] Hệ thống phải hỗ trợ nhiều giao thức IoT tiêu chuẩn để kết nối với cảm biến và gateway.
+\end{enumerate}
+\ssssection{\textbf{Tính toàn vẹn dữ liệu (Data Integrity)}}
+\begin{enumerate}
+    \item [-] Mọi hoạt động của bãi xe (xe ra/vào, lịch sử thanh toán,...) phải được ghi log để thuận tiện cho việc kiểm tra.
+    \item [-] Hệ thống phải có cơ chế backup dữ liệu ít nhất là 1 lần/ngày.
+\end{enumerate}
+\newpage  
+
+\subsection{\textbf{Usecase diagram}}
+
+
+
+\subsubsection{Cho toàn bộ hệ thống} 
+
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.7]{Images/Task1/Use case diagram.png} 
+        \caption{Use case diagram cho toàn bộ hệ thống}
+    \end{figure}
+    \bigskip
+
+
+    \bigskip
+
+
+\newpage
+
+\subsubsection{Bảng mô tả usecase}
+
+\textbf{Các use case cần mô tả: }
+
+\begin{center}
+    \begin{tabular}{|c|l|m{7cm}|} \hline 
+         \rule{0pt}{4ex}\textbf{Mã Usecase} & \textbf{Tên Usecase}& \textbf{Mô tả}\\[.2cm] \hline 
+         \xrowht{30pt}   UC001   & Đăng nhập qua SSO                        & Nhân viên hoặc quản trị viên đăng nhập vào hệ thống thông qua HCMUT SSO để truy cập các chức năng quản lý. \\   \hline
+         \xrowht{30pt}   UC002   & Quẹt thẻ nội bộ      & Người dùng nội bộ (sinh viên, giảng viên, cán bộ) quẹt thẻ định danh tại cổng để vào hoặc ra khỏi bãi xe. \\  \hline
+         \xrowht{30pt}   UC003   & Quẹt thẻ vãng lai      & Khách vãng lai nhận vé hoặc quẹt thẻ tạm thời tại cổng để vào hoặc ra khỏi bãi xe. \\  \hline
+         \xrowht{30pt}   UC004   & Thanh toán tại chỗ      & Khách vãng lai thực hiện thanh toán phí gửi xe trực tiếp tại cổng khi rời bãi xe.\\  \hline 
+         \xrowht{30pt}   UC005   & Thanh toán trả trước   & Người dùng nội bộ thanh toán phí gửi xe định kỳ thông qua hệ thống BKPay. \\  \hline 
+         \xrowht{30pt}   UC006  & Kiểm tra và điều hướng trạng thái bãi xe & Hệ thống thu thập dữ liệu từ cảm biến và IoT Gateway để hiển thị trạng thái bãi xe (còn chỗ, gần đầy, hết chỗ) và hỗ trợ điều hướng.\\  \hline 
+        \xrowht{30pt}   UC007   & Cấu hình chính sách giá và quyền lợi gửi xe      & Quản trị viên thiết lập hoặc điều chỉnh chính sách giá và quyền lợi gửi xe cho từng nhóm người dùng. \\ \hline
+
+          \xrowht{30pt}   UC008   & Thống kê và xuất báo cáo & Quản trị viên hoặc nhân viên xem và xuất báo cáo thống kê về lượt gửi xe, doanh thu và tình trạng bãi xe. \\  \hline 
+         \xrowht{30pt}   UC009   & Giám sát và đồng bộ dữ liệu & Hệ thống giám sát trạng thái các cảm biến, gateway và đồng bộ dữ liệu với HCMUT DATACORE để đảm bảo tính nhất quán. \\  \hline
+         \xrowht{30pt}   UC010   & Xử lý sự cố tại chỗ & Nhân viên tiếp nhận phản ánh sự cố từ người dùng (ví dụ: mất thẻ, lỗi cổng, lỗi thanh toán), ghi nhận sự cố vào hệ thống và gửi thông báo đến quản trị viên để kiểm tra và xử lý. \\  \hline
+    \end{tabular}
+\end{center}
+
+\newpage
+
+\ssssection{Bảng mô tả usecase Đăng nhập qua SSO}
+
+
+\input{Contents/Main/usecase/1-Login}
+
+\newpage
+
+\ssssection{Bảng mô tả usecase Quẹt thẻ nội bộ}
+
+\input{Contents/Main/usecase/2-quetthenoibo}
+
+\newpage
+
+\ssssection{Bảng mô tả usecase Quẹt thẻ vãng lai }
+
+
+\input{Contents/Main/usecase/3-quetthevanglai}
+
+\vspace{1cm}
+
+\newpage
+
+\ssssection{Bảng mô tả usecase Thanh toán tại chỗ}
+
+\input{Contents/Main/usecase/4-thanhtoantaicho}
+
+\newpage
+
+\ssssection{Bảng mô tả usecase Thanh toán trả trước}
+
+
+\input{Contents/Main/usecase/5-thanhtoantratruoc}
+
+\vspace{1cm}
+
+\newpage
+
+\ssssection{Bảng mô tả usecase Kiểm tra và điều hướng trạng thái bãi xe}
+
+
+\input{Contents/Main/usecase/6-kiemtravadieuhuong}
+
+\newpage
+
+\ssssection{Bảng mô tả usecase Cấu hình chính sách giá và quyền lợi gửi xe}
+
+
+\input{Contents/Main/usecase/7-cauhinhchinhsachgia}
+
+\newpage
+
+
+\ssssection{Bảng mô tả usecase Thống kê và xuất báo cáo}
+
+
+\input{Contents/Main/usecase/8-thongkevaxuatbaocao}
+
+\newpage
+
+
+\ssssection{Bảng mô tả usecase Giám sát và đồng bộ dữ liệu}
+
+\input{Contents/Main/usecase/9-giamsatvadongbo}
+
+\ssssection{Bảng mô tả usecase Xử lý sự cố tại chỗ}
+
+\input{Contents/Main/usecase/10-xulysuco}

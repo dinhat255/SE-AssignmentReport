@@ -1,0 +1,77 @@
+\renewcommand{\arraystretch}{1.4}
+\begin{center}
+\begin{longtable}{|m{2.5cm}|m{13cm}|}
+\hline
+ID Use-case  & UC008 \\ 
+Name Use-case & Thống kê và xuất báo cáo \\ 
+\hline
+Actors & Primary actors: Nhân viên, Quản trị viên.\\
+\hline
+Description & Use case này cho phép nhân viên hoặc quản trị viên xem, lọc, tổng hợp và xuất báo cáo về hoạt động của hệ thống Smart Parking. Báo cáo có thể bao gồm số lượt gửi xe, doanh thu, tình trạng sử dụng bãi xe, tỷ lệ lấp đầy, số lượng giao dịch và các chỉ số vận hành khác. Chức năng này hỗ trợ công tác giám sát, kiểm tra và quản lý hệ thống. \\ \hline
+Trigger & Nhân viên hoặc quản trị viên chọn chức năng thống kê và xuất báo cáo trên giao diện hệ thống.\\
+\hline
+Preconditions & 
+1. Người dùng đã đăng nhập vào hệ thống.
+
+2. Người dùng có quyền truy cập chức năng thống kê và xuất báo cáo.
+
+3. Dữ liệu gửi xe, thanh toán và trạng thái bãi xe đã được lưu trữ trong hệ thống.
+
+4. Hệ thống đã được cấu hình các mẫu báo cáo hoặc các tiêu chí lọc báo cáo cơ bản.\\
+\hline
+Post conditions & 
+1. Báo cáo được hiển thị thành công trên hệ thống theo điều kiện đã chọn.
+
+2. Nếu người dùng yêu cầu xuất báo cáo, hệ thống tạo thành công tệp báo cáo theo định dạng được chọn.
+
+3. Hệ thống ghi nhận lịch sử xem và xuất báo cáo để phục vụ truy vết và kiểm tra sau này.\\
+\hline
+Normal flow & 
+1. Nhân viên hoặc quản trị viên truy cập chức năng thống kê và xuất báo cáo.
+
+2. Hệ thống hiển thị các tiêu chí lọc báo cáo như khoảng thời gian, khu vực bãi xe, loại người dùng hoặc loại báo cáo.
+
+3. Người dùng chọn hoặc nhập các tiêu chí thống kê mong muốn.
+
+4. Hệ thống kiểm tra tính hợp lệ của các tiêu chí được nhập.
+
+5. Hệ thống truy xuất dữ liệu liên quan từ các phân hệ gửi xe, thanh toán và trạng thái bãi xe.
+
+6. Hệ thống tổng hợp dữ liệu và tính toán các chỉ số thống kê cần thiết.
+
+7. Hệ thống hiển thị báo cáo dưới dạng bảng, danh sách hoặc biểu đồ.
+
+8. Người dùng kiểm tra nội dung báo cáo hiển thị trên màn hình.
+
+9. Người dùng chọn chức năng xuất báo cáo.
+
+10. Hệ thống yêu cầu người dùng chọn định dạng xuất tệp.
+
+11. Người dùng chọn định dạng xuất phù hợp.
+
+12. Hệ thống tạo tệp báo cáo và cung cấp cho người dùng tải xuống hoặc lưu trữ.\\
+\hline
+Alternative flow & 
+A1. Tại bước 2, người dùng chọn nhanh một mẫu báo cáo có sẵn như báo cáo ngày, báo cáo tuần hoặc báo cáo tháng thay vì tự nhập đầy đủ tiêu chí.
+
+A2. Tại bước 8, người dùng chỉ xem báo cáo trên màn hình và kết thúc use case mà không thực hiện xuất tệp.
+
+A3. Tại bước 10, hệ thống cung cấp nhiều định dạng xuất như PDF hoặc Excel và người dùng chọn một định dạng phù hợp.
+
+A4. Tại bước 6, nếu người dùng là quản trị viên, hệ thống hiển thị thêm các chỉ số chi tiết hơn so với nhân viên theo quyền được cấp.\\ 
+\hline
+Exception flow & 
+E1. Tại bước 4, nếu tiêu chí lọc không hợp lệ, hệ thống thông báo lỗi và yêu cầu người dùng nhập lại.
+
+E2. Tại bước 5, nếu không có dữ liệu phù hợp với điều kiện lọc, hệ thống thông báo không có dữ liệu và không tạo báo cáo.
+
+E3. Tại bước 5, nếu xảy ra lỗi khi truy xuất dữ liệu, hệ thống thông báo lỗi và cho phép người dùng thử lại sau.
+
+E4. Tại bước 9, nếu người dùng không có quyền xuất báo cáo, hệ thống từ chối thao tác xuất và thông báo quyền truy cập không hợp lệ.
+
+E5. Tại bước 12, nếu hệ thống không thể tạo tệp báo cáo, hệ thống thông báo lỗi xuất tệp và ghi log sự cố để kiểm tra.
+
+E6. Nếu phiên đăng nhập của người dùng hết hạn trong quá trình thao tác, hệ thống yêu cầu người dùng đăng nhập lại trước khi tiếp tục.\\
+\hline
+\end{longtable}
+\end{center}

@@ -1,0 +1,99 @@
+\begin{center}
+    \begin{tabular}{|m{2.5cm}|m{13cm}|}
+    \hline
+        ID Use-case  & UC005 \\ 
+        Name Use-case & Thanh toán trả trước \\ 
+    \hline
+        Actors & Người dùng nội bộ, BKPay, HCMUT DataCore\\
+    \hline
+        Description & Tính năng cho phép người dùng nội bộ đăng ký hoặc gia hạn gói gửi xe trả trước theo chu kỳ. Sau đó thực hiện thanh toán thông qua BKPay, hệ thống xác thực và kích hoạt gói gửi xe cho tài khoản người dùng. \\
+    \hline
+        Trigger & Người dùng chọn "Gửi xe trả trước" trên hệ thống.\\
+    \hline
+        Preconditions & 
+        1. Người dùng đã đăng nhập hệ thống thành công thông qua HCMUT SSO.
+
+        2. Người dùng có thẻ id nội bộ (thẻ sinh viên, ...)
+        
+        3. Hệ thống BKPay đang hoạt động.
+        \\
+    \hline
+        Post conditions & 
+        1. Gói gửi xe trả trước được kích hoạt hoặc gia hạn cho người dùng.
+        
+        2. Thông tin thanh toán được lưu vào hệ thống.
+        
+        3. Người dùng có thể sử dụng thẻ nội bộ để gửi xe trong thời gian gói còn hiệu lực.\\
+    \hline
+        Normal flow & 
+        1. Người dùng chọn chức năng "Gửi xe trả trước".
+        
+        2. Hệ thống hiển thị danh sách các gói gửi xe trả trước (ví dụ: gói tuần, gói tháng, gói học kỳ, ...).
+        
+        3. Người dùng chọn một gói gửi xe phù hợp.
+        
+        4. Hệ thống hiển thị thông tin chi tiết của gói(thời hạn, giá tiền, quyền lợi) và tùy chọn "Đăng ký" hoặc "Gia hạn".
+        
+        5. Người dùng chọn "Đăng ký" và hệ thống hiện tùy chọn "Xác nhận" hoặc "Hủy".
+        
+        6. Sau khi người dùng chọn xác nhận, hệ thống gửi yêu cầu thanh toán đến BKPay.
+        
+        7. BKPay hiển thị giao diện thanh toán cho người dùng.
+        
+        8. Người dùng thực hiện thanh toán trên BKPay.
+        
+        9. BKPay gửi kết quả thanh toán về hệ thống.
+        
+        10. Hệ thống xác thực thành công và kích hoạt gói gửi xe cho tài khoản người dùng.
+        
+        11. Hệ thống thông báo thanh toán thành công.\\
+        \hline
+    \end{tabular}
+\end{center}
+
+\begin{center}
+    \begin{tabular}{|m{2.5cm}|m{13cm}|}
+    \hline
+        Alternative flow & 
+        \textbf{Alternative 1:} Gia hạn khi gói hiện tại vẫn còn hiệu lực.
+        
+        1. Người dùng chọn gói bất kỳ và nhấn "Gia hạn".
+
+        2. Hệ thống hỏi người dùng có muốn gia hạn bằng gói này hay không và người dùng chọn "Xác nhận".
+        
+        3. Sau khi thanh toán thành công, hệ thống cộng thêm thời gian gói mới vào thời hạn hiện tại. 
+        
+         \textbf{Alternative 2:} Người dùng đăng ký 1 gói khác khi gói hiện tại đang còn hiệu lực.
+        
+        1. Người dùng chọn 1 gói và ấn "Đăng ký".
+
+        2. Hệ thống gửi thông báo lên màn hình "Gói hiện tại vẫn đang còn hiệu lực, hãy gia hạn !" khoảng 3 giây thì biến mất.
+
+        3. Người dùng chọn "Gia hạn" hoặc thoát khỏi hệ thống.
+
+         \textbf{Alternative 3:} Người dùng hủy giao dịch thanh toán.
+        
+        1. Trong bước thanh toán, người dùng chọn hủy giao dịch trên BKPay.
+
+        2. BKPay gửi trạng thái hủy về hệ thống.
+
+        3. Hệ thống hủy yêu cầu thanh toán và hiện thông báo thanh toán thất bại.
+        \\ 
+    \hline
+        Exception flow & 
+        \textbf{Exception 1:} Thanh toán thất bại.
+        
+        1. BKPay không thể xử lý giao dịch thanh toán(có thể do ứng dụng ngân hàng bị lỗi, tình trạng kết nối mạng hoặc do hệ thống BKPay).
+
+        2. BKPay gửi trạng thái thất bại về hệ thống.
+
+        3. Hệ thống hiển thị thông báo thanh toán thất bại cho người dùng.
+
+        \textbf{Exception 2:} Không kết nối được BKPay.
+        
+        1. Hệ thống không thể gửi yêu cầu thanh toán đến BKPay.
+
+        2. Hệ thống thông báo lỗi và yêu cầu người dùng thử lại sau.\\
+        \hline
+    \end{tabular}
+\end{center}

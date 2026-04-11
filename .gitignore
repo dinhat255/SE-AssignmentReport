@@ -1,0 +1,36 @@
+# LaTeX intermediate/build files
+*.aux
+*.lof
+*.log
+*.lot
+*.toc
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.nav
+*.snm
+*.vrb
+*.xdv
+*.dvi
+*.ps
+
+# Generated PDF (uncomment if you do NOT want to commit PDFs)
+# *.pdf
+
+# Temporary/editor files
+*~
+*.swp
+*.tmp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code settings (optional)
+.vscode/

@@ -1,0 +1,72 @@
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{ID Use-case} & UC007 \\ \hline
+
+\textbf{Name use-case } 
+& Cấu Hình Chính Sách Giá \& Quyền Lợi Gửi Xe \\ \hline
+
+\textbf{Actors} 
+& Quản trị viên \\ \hline
+
+\textbf{Description} 
+& Cho phép Quản trị viên điều chỉnh và xem xét các chính sách giá và quyền lợi gửi xe 
+(áp dụng cho Người dùng nội bộ và Khách vãng lai). \\ \hline
+\textbf{Trigger} 
+& Quản trị viên nhấn nút ``Cấu Hình Chính Sách Giá'' trên Dashboard quản trị. \\ \hline
+\textbf{Preconditions} 
+& 
+Hệ thống đang hoạt động.
+
+ Quản trị viên đã đăng nhập thành công qua SSO.
+\\ \hline
+
+
+\textbf{Post conditions} 
+& 
+Chính sách giá mới được lưu trong cơ sở dữ liệu.
+
+    Các phiên gửi xe mới sẽ áp dụng chính sách vừa cập nhật.
+    
+    Thay đổi được ghi nhận trong hệ thống.
+ \\ \hline
+
+\textbf{Normal flow} 
+& 
+
+    1. Hệ thống hiển thị danh sách chính sách giá hiện tại.
+    
+    2. Quản trị viên chọn loại người dùng (Người dùng nội bộ hoặc Khách vãng lai).
+    
+    3. Quản trị viên chỉnh sửa các thông số: giá theo giờ, phút miễn phí, mức giảm giá (nếu có).
+    
+    4. Quản trị viên nhấn nút ``Lưu''.
+    
+    5. Hệ thống kiểm tra tính hợp lệ của dữ liệu.
+    
+    6. Hệ thống cập nhật chính sách vào cơ sở dữ liệu.
+    
+    7. Hệ thống ghi nhận lịch sử thay đổi cấu hình.
+    
+    8. Hệ thống hiển thị thông báo cập nhật thành công.
+\\ \hline
+
+
+\textbf{Exception flow} 
+& 
+E1 – Dữ liệu không hợp lệ: 
+Nếu Quản trị viên nhập giá trị không hợp lệ (ví dụ: giá âm, phần trăm giảm giá vượt quá 100\%), hệ thống hiển thị thông báo lỗi và không lưu thay đổi.  
+
+E2 – Không thể kết nối cơ sở dữ liệu:
+Nếu hệ thống không thể cập nhật cơ sở dữ liệu, hệ thống hiển thị thông báo lỗi và không thay đổi cấu hình. \\ \hline
+\textbf{Alternative flow} &
+A1 – Không có thay đổi cấu hình: Nếu sau bước 3 Quản trị viên không thay đổi bất kỳ thông tin nào của chính sách giá, khi nhấn ``Lưu'', hệ thống phát hiện không có thay đổi và hiển thị thông báo ``Không có thay đổi để lưu''. Use case kết thúc và dữ liệu không bị thay đổi. 
+
+ A2 – Hủy thao tác cấu hình: Sau bước 3, Quản trị viên quyết định không tiếp tục chỉnh sửa và chọn ``Hủy'' hoặc quay lại Dashboard. Hệ thống không lưu bất kỳ thay đổi nào và quay lại màn hình danh sách chính sách giá. 
+
+A3 – Tiếp tục chỉnh sửa chính sách khác: Sau bước 8, nếu Quản trị viên muốn chỉnh sửa một chính sách khác, hệ thống hiển thị lại danh sách các chính sách giá. Quản trị viên chọn một chính sách khác và quy trình quay lại bước 2. \\
+\hline
+\end{tabular}
+\end{table}

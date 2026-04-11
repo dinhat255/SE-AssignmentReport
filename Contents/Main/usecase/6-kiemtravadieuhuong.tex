@@ -1,0 +1,69 @@
+\renewcommand{\arraystretch}{1.4}
+\begin{center}
+\begin{longtable}{|m{2.5cm}|m{13cm}|}
+\hline
+ID Use-case  & UC006 \\ 
+Name Use-case & Kiểm tra và điều hướng trạng thái bãi xe \\ 
+\hline
+Actors & Primary actors: Người dùng nội bộ, Khách vãng lai, Nhân viên. Secondary actor: IoT Gateway.\\
+\hline
+Description & Use case này cho phép người dùng hoặc nhân viên kiểm tra trạng thái hiện tại của bãi xe và nhận hướng dẫn đến khu vực đỗ phù hợp. Hệ thống thu thập dữ liệu từ các cảm biến thông qua IoT Gateway, xác định số chỗ trống tại từng khu vực, phân loại trạng thái của bãi xe, sau đó hiển thị thông tin và điều hướng đến khu vực còn chỗ hoặc khu vực thay thế phù hợp. Chức năng này hỗ trợ mục tiêu quản lý bãi xe gần thời gian thực và giảm thời gian tìm chỗ đỗ. \\ \hline
+Trigger & Người dùng hoặc nhân viên yêu cầu xem trạng thái bãi xe, hoặc hệ thống nhận được dữ liệu cập nhật mới từ IoT Gateway.\\
+\hline
+Preconditions & 
+1. Hệ thống Smart Parking đang hoạt động bình thường.
+
+2. Sơ đồ bãi xe, khu vực đỗ xe và quy tắc phân loại trạng thái đã được cấu hình trong hệ thống.
+
+3. IoT Gateway có thể gửi dữ liệu cảm biến, hoặc hệ thống vẫn còn dữ liệu gần nhất còn hiệu lực để sử dụng tạm thời.
+
+4. Thiết bị hiển thị trạng thái như bảng điện tử, kiosk hoặc giao diện người dùng có thể truy cập được.\\
+\hline
+Post conditions & 
+1. Trạng thái bãi xe được cập nhật và hiển thị trên hệ thống.
+
+2. Người dùng hoặc nhân viên nhận được thông tin về khu vực còn chỗ hoặc khu vực thay thế phù hợp.
+
+3. Hệ thống lưu lại bản ghi cập nhật trạng thái và cảnh báo nếu phát hiện dữ liệu bất thường hoặc lỗi đồng bộ.\\
+\hline
+Normal flow & 
+1. IoT Gateway gửi dữ liệu trạng thái từ các cảm biến chỗ đỗ về hệ thống.
+
+2. Hệ thống tiếp nhận dữ liệu và kiểm tra tính hợp lệ của dữ liệu nhận được.
+
+3. Hệ thống tổng hợp số chỗ trống theo từng khu vực của bãi xe.
+
+4. Hệ thống xác định trạng thái của từng khu vực, ví dụ còn chỗ, gần đầy hoặc hết chỗ.
+
+5. Người dùng hoặc nhân viên truy cập chức năng kiểm tra trạng thái bãi xe.
+
+6. Hệ thống hiển thị trạng thái hiện tại của các khu vực trong bãi xe.
+
+7. Hệ thống xác định khu vực phù hợp dựa trên số chỗ trống hiện có và loại người dùng.
+
+8. Hệ thống hiển thị hướng dẫn đến khu vực đỗ phù hợp cho người dùng hoặc nhân viên.
+
+9. Người dùng hoặc nhân viên tiếp nhận thông tin điều hướng và thực hiện di chuyển theo hướng dẫn.\\
+\hline
+Alternative flow & 
+A1. Tại bước 7, nếu khu vực ưu tiên cho loại người dùng đó gần đầy, hệ thống đề xuất khu vực thay thế còn nhiều chỗ hơn.
+
+A2. Tại bước 5, nếu nhân viên truy cập chức năng giám sát, hệ thống hiển thị trạng thái chi tiết hơn theo từng khu hoặc từng cụm cảm biến thay vì chỉ hiển thị thông tin tổng quát.
+
+A3. Tại bước 8, nếu người dùng chỉ xem thông tin trên bảng điện tử tại cổng, hệ thống chỉ hiển thị khu vực đề xuất và chỉ dẫn ngắn gọn thay vì hiển thị bản đồ chi tiết.
+
+A4. Tại bước 7, nếu người dùng thuộc nhóm có quyền lợi gửi xe riêng theo chính sách hệ thống, hệ thống ưu tiên điều hướng đến khu vực tương ứng nếu khu đó còn chỗ.\\ 
+\hline
+Exception flow & 
+E1. Tại bước 2, nếu dữ liệu từ IoT Gateway không hợp lệ hoặc thiếu dữ liệu từ một số cảm biến, hệ thống đánh dấu khu vực liên quan là không xác định và gửi cảnh báo cho nhân viên.
+
+E2. Tại bước 1, nếu IoT Gateway mất kết nối, hệ thống sử dụng dữ liệu gần nhất còn hiệu lực để hiển thị tạm thời và kèm theo cảnh báo rằng dữ liệu có thể bị trễ.
+
+E3. Tại bước 7, nếu toàn bộ bãi xe đã đầy, hệ thống hiển thị trạng thái hết chỗ và không đưa ra điều hướng vào khu vực đỗ xe.
+
+E4. Tại bước 6, nếu giao diện hiển thị hoặc bảng điện tử không phản hồi, hệ thống ghi log lỗi và thông báo cho nhân viên kiểm tra thiết bị.
+
+E5. Tại bước 3, nếu dữ liệu tổng hợp giữa các cảm biến không nhất quán, hệ thống không thực hiện điều hướng tự động cho khu vực đó và chuyển cảnh báo đến nhân viên để xác minh.\\
+\hline
+\end{longtable}
+\end{center}

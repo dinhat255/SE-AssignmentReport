@@ -1,0 +1,63 @@
+\begin{center}
+    \begin{tabular}{|m{2.5cm}|m{13cm}|}
+    \hline
+        ID Use-case  & UC001 \\ 
+        Name Use-case & Đăng nhập qua SSO \\ 
+    \hline
+        Actors & Người dùng nội bộ, Nhân viên, Quản trị viên, HCMUT\_SSO (Dịch vụ xác thực)\\
+    \hline
+        Description & Người dùng thực hiện đăng nhập vào hệ thống quản lý bãi đỗ xe thông minh thông qua dịch vụ xác thực HCMUT\_SSO. Sau khi xác thực thành công, hệ thống cho phép người dùng truy cập các chức năng tương ứng với vai trò của mình. \\
+    \hline
+        Trigger & Người dùng chọn nút “Đăng nhập qua SSO” trên giao diện hệ thống.\\
+    \hline
+        Preconditions & 
+        1. Người dùng thuộc một trong các nhóm được phép truy cập hệ thống: người dùng nội bộ, nhân viên hoặc quản trị viên.
+        
+        2. Người dùng đã truy cập vào giao diện hệ thống quản lý bãi đỗ xe.
+        
+        3. Người dùng chưa đăng nhập vào hệ thống.
+        
+        4. Dịch vụ HCMUT\_SSO đang hoạt động bình thường.\\
+    \hline
+        Post conditions & 
+        1. Người dùng được xác thực thành công bởi HCMUT\_SSO.
+        
+        2. Hệ thống tạo phiên đăng nhập cho người dùng.
+        
+        3. Người dùng được cấp quyền truy cập theo vai trò của mình (người dùng nội bộ, nhân viên hoặc quản trị viên).\\
+    \hline
+        Normal flow & 
+        1. Người dùng chọn chức năng “Đăng nhập qua SSO”.
+        
+        2. Hệ thống chuyển hướng người dùng đến trang xác thực của HCMUT\_SSO.
+        
+        3. Người dùng nhập thông tin đăng nhập của tài khoản trường.
+        
+        4. HCMUT\_SSO kiểm tra tính hợp lệ của thông tin xác thực.
+        
+        5. Nếu xác thực thành công, HCMUT\_SSO trả kết quả xác thực về hệ thống.
+        
+        6. Hệ thống tạo phiên đăng nhập cho người dùng.
+        
+        7. Hệ thống chuyển người dùng đến giao diện chức năng phù hợp với vai trò của họ.\\
+    \hline
+        Alternative flow & 
+        Ở bước 3, nếu người dùng chọn “Quên mật khẩu”, hệ thống chuyển người dùng sang chức năng khôi phục mật khẩu của HCMUT\_SSO.
+        
+        Ở bước 7, tùy theo vai trò người dùng:
+        
+        - Người dùng nội bộ được chuyển đến giao diện các chức năng cá nhân.
+        
+        - Nhân viên được chuyển đến giao diện vận hành bãi xe.
+        
+        - Quản trị viên được chuyển đến giao diện quản trị hệ thống.\\ 
+    \hline
+        Exception flow & 
+        Ở bước 4, nếu thông tin đăng nhập không hợp lệ:
+        
+        - HCMUT\_SSO thông báo lỗi xác thực.
+        
+        - Người dùng được yêu cầu nhập lại thông tin đăng nhập.\\
+    \hline
+    \end{tabular}
+\end{center}

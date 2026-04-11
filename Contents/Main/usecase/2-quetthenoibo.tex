@@ -1,0 +1,37 @@
+\begin{center}
+    \begin{longtable}{|>{\raggedright\arraybackslash}m{3.5cm}|m{12cm}|}
+\hline
+    \textbf{ID Use-case}  & UC002 \\ 
+\hline
+    \textbf{Name Use-case} & Quẹt thẻ nội bộ (Internal Card Check-in / Check-out) \\ 
+\hline
+    \textbf{Actors} & Người dùng nội bộ, Hệ thống IoT (IoT Gateway, Đầu đọc thẻ RFID, camera, Barrier), HCMUT\_DATACORE. \\
+\hline
+    \textbf{Description} & Hỗ trợ kiểm soát ra vào tự động bằng cách ghi nhận và xác thực thông tin xe của người dùng nội bộ (sinh viên, cán bộ) qua thẻ định danh đã được tích hợp thông tin người sử dụng trên hệ thống HCMUT\_DATACORE. \\
+\hline
+    \textbf{Trigger} & Người dùng nội bộ quẹt thẻ định danh của mình vào đầu đọc RFID tại trạm kiểm soát (cổng vào hoặc cổng ra). \\
+\hline
+    \textbf{Preconditions} & 
+    1. Hệ thống trung tâm và các thiết bị phần cứng tại cổng (đầu đọc RFID, camera, barrier) đang hoạt động bình thường. \newline
+    2. Thẻ định danh của người dùng đã được đồng bộ thông tin từ HCMUT\_DATACORE và đang ở trạng thái kích hoạt. \newline
+    3. Đường truyền mạng giữa cổng IoT cục bộ và hệ thống trung tâm ổn định. \\
+\hline
+    \textbf{Post conditions} & Lượt ra/vào của người dùng được ghi nhận thành công; thanh chắn tự động đóng lại; trạng thái số chỗ trống của bãi xe được hệ thống cập nhật tự động (tăng/giảm) theo thời gian thực. \\
+\hline
+    \textbf{Normal flow} & 
+    1. Đầu đọc thẻ RFID tại cổng IoT cục bộ nhận mã thẻ và truyền dữ liệu về hệ thống trung tâm. \newline
+    2. Camera tại cổng đồng thời chụp lại hình ảnh biển số xe và người điều khiển. \newline
+    3. Hệ thống đối chiếu mã thẻ với dữ liệu từ HCMUT\_DATACORE để xác thực quyền hạn ra vào của người dùng. \newline
+    4. Nếu là lượt vào: Hệ thống khởi tạo một phiên gửi xe mới, liên kết mã thẻ với thời gian vào và biển số xe vừa nhận diện được. \newline
+    5. Nếu là lượt ra: Hệ thống truy xuất phiên gửi xe hiện tại của thẻ, đối chiếu biển số xe chụp lúc ra với biển số xe đã lưu lúc vào. \newline
+    6. Hệ thống gửi lệnh qua IoT Gateway để mở thanh chắn (barrier) cho phương tiện di chuyển. \newline
+    7. Sau khi xe đi qua, hệ thống ghi nhận đầy đủ giao dịch vào cơ sở dữ liệu để phục vụ truy vết và báo cáo. \\
+\hline
+    \textbf{Exception flow} & 
+    1. \textbf{Thẻ không hợp lệ / không có quyền trên HCMUT\_DATACORE}: Hệ thống hiển thị thông báo từ chối trên màn hình LED tại cổng, phát âm thanh cảnh báo và barrier không mở. \newline
+    2. \textbf{Không nhận diện được biển số (camera lóa, khuất)}: Hệ thống cảnh báo lỗi đọc camera. Hệ thống báo động để nhân viên xử lý sự cố tại chỗ (UC10) kiểm tra hình ảnh thực tế và nhập biển số thủ công vào hệ thống để tiếp tục quy trình. \newline
+    3. \textbf{Biển số ra không khớp biển số vào}: Barrier không mở. Hệ thống báo động để nhân viên xử lý sự cố tại chỗ (UC10) ra đối chiếu giấy tờ xe thủ công. \newline
+    4. \textbf{Mất kết nối mạng}: Cổng IoT chuyển sang chế độ offline, cho phép mở barrier dựa trên danh sách thẻ hợp lệ (whitelist) đã được lưu sẵn cục bộ tại cổng và lưu trữ dữ liệu lượt vào/ra để tự động đồng bộ lên hệ thống trung tâm khi có mạng trở lại. \\
+\hline
+\end{longtable}
+\end{center}

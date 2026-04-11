@@ -1,0 +1,43 @@
+\begin{center}
+    \begin{longtable}{|>{\raggedright\arraybackslash}m{3.5cm}|m{12cm}|}
+\hline
+    \textbf{ID Use-case}  & UC003 \\ 
+\hline
+    \textbf{Name Use-case} & Quẹt thẻ vãng lai (Visitor Card Check-in). \\ 
+\hline
+    \textbf{Actors} & Nhân viên vận hành bãi xe, Khách vãng lai, Hệ thống IoT (Đầu đọc thẻ RFID, Camera, Barrier). \\
+\hline
+    \textbf{Description} & Nhân viên bãi xe sử dụng thẻ vãng lai (thẻ RFID dùng chung của bãi) để phát cho khách lúc vào, ghi nhận hình ảnh/biển số xe. Khi khách ra, nhân viên thu lại thẻ, hệ thống đối chiếu biển số để nhân viên thu tiền trực tiếp. Quá trình này tạo ra một phiên đỗ xe tạm thời, không yêu cầu thiết lập tài khoản cá nhân. \\
+\hline
+    \textbf{Trigger} & 
+    - Lượt vào: Nhân viên quẹt một thẻ vãng lai trống vào đầu đọc để phát cho khách. \newline
+    - Lượt ra: Nhân viên nhận lại thẻ từ khách và quẹt vào đầu đọc để kiểm tra. \\
+\hline
+    \textbf{Preconditions} & 
+    1. Hệ thống hoạt động bình thường. \newline
+    2. Nhân viên trực cổng có sẵn danh sách thẻ vãng lai trống (chưa gắn với xe nào đang trong bãi). \\
+\hline
+    \textbf{Post conditions} & Phiên đỗ xe của khách vãng lai hoàn tất và được lưu lại lịch sử (giờ vào/ra, ảnh, biển số) vào CSDL để phục vụ truy vết. Thẻ vãng lai được thu hồi để tái sử dụng. Nhân viên đã thu được tiền mặt. \\
+\hline
+    \textbf{Normal flow} & 
+    \textbf{Luồng vào (Check-in):} \newline
+    1. Nhân viên quẹt thẻ vãng lai vào đầu đọc. \newline
+    2. Camera tự động chụp biển số và hình ảnh người lái xe. \newline
+    3. Hệ thống tạo một "phiên đỗ xe tạm", gắn mã thẻ với hình ảnh/biển số vừa chụp và lưu giờ vào. (Không lưu thông tin định danh nào khác). \newline
+    4. Nhân viên đưa thẻ cho khách vãng lai và khách lái xe vào bãi sau đó hệ thống mở barrier. \newline
+    \newline
+    \textbf{Luồng ra (Check-out):} \newline
+    5. Khách ra cổng và trả lại thẻ cho nhân viên. \newline
+    6. Nhân viên quẹt thẻ vào đầu đọc. \newline
+    7. Camera chụp hình ảnh/biển số lúc ra. \newline
+    8. Hệ thống hiển thị hình ảnh/biển số lúc vào và lúc ra lên màn hình của nhân viên để đối chiếu, đồng thời tính toán phí gửi xe dựa trên thời gian đỗ. \newline
+    9. Nhân viên thu tiền mặt trực tiếp từ khách và bấm xác nhận hoàn tất trên phần mềm. \newline
+    10. Hệ thống kết thúc "phiên đỗ xe tạm", reset thẻ về trạng thái trống và mở barrier cho khách ra. \\
+\hline
+    \textbf{Exception flow} & 
+    1. \textbf{Biển số ra không khớp biển số vào}: Hệ thống cảnh báo đỏ trên màn hình, barrier không mở. Nhân viên yêu cầu khách xuất trình giấy tờ xe để xử lý thủ công (kích hoạt UC10: Xử lý sự cố tại chỗ). \newline
+    2. \textbf{Khách làm mất thẻ (Lượt ra)}: Nhân viên yêu cầu khách cung cấp biển số xe, nhân viên tìm kiếm thủ công trên phần mềm để lấy thông tin lượt vào. Hệ thống tính phí đỗ xe + phí phạt mất thẻ. Nhân viên thu tiền, bấm mở barrier thủ công và hệ thống đánh dấu thẻ bị mất là "Đã khóa". \newline
+    3. \textbf{Camera không đọc được biển số}: Nhân viên chủ động gõ biển số bằng tay vào phần mềm hệ thống để điền khuyết dữ liệu rồi mới cho xe qua. \\
+\hline
+\end{longtable}
+\end{center}
