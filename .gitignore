@@ -19,9 +19,6 @@
 *.dvi
 *.ps
 
-# Generated PDF (uncomment if you do NOT want to commit PDFs)
-# *.pdf
-
 # Temporary/editor files
 *~
 *.swp
