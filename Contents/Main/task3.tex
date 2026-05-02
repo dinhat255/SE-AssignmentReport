@@ -1,0 +1,28 @@
+\section{Development view}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Images/Task3/componentDiagram.jpg}
+    \caption{Component Diagram cho toàn bộ hệ thống}
+\end{figure}
+\textbf{Mô tả:} Sơ đồ thành phần miêu tả cấu trúc của hệ thống, được chia thành ba tầng chính:Frontend, Services (Business Layer), Data Access và Database.
+\begin{enumerate}
+    \item \textbf{Front end components:} Tầng giao diện dành cho người dùng gồm 5 thành phần chính, ứng với các đối tượng sử dụng trong hệ thống.
+    \begin{itemize}
+        \item Quản trị viên (Admin Dashboard): quản trị toàn bộ hệ thống, dùng để theo dõi, giám sát toàn bộ hoạt động và đưa ra hành động yêu cầu sửa chữa khi cần.
+        \item Người dùng nội bộ (Sinh viên/ Giảng viên): cho phép thành viên đăng nhập thông qua SSO. Đồng thời thực hiện các dịch vụ thanh toán cho các lượt giữ xe và hiển thị cho người dùng biết tình hình bãi xe.
+        \item Nhân viên (Giám sát trực tiếp): nhân viên đăng nhập vào hệ thống thông qua SSO. Có vai trò quản lý tình hình bãi xe trực tiếp.
+        \item Khách vãng lai (Kiosk/ Bảng LED): người dùng được cấp tạm 1 thẻ chứa thông tin tạm thời để sử dụng dịch vụ gửi xe.
+    \end{itemize}
+    \item \textbf{Services/ Business Layer:} Lớp dịch vụ xử lý toàn bộ logic  của hệ thống. Gồm các module chính:
+    \begin{itemize}
+        \item Dịch vụ báo cáo: báo cáo và phản hồi các sự cố xảy ra trong bãi giữ xe.
+        \item Dịch vụ thanh toán: để giao dịch các khoản tiền phí giữ xe thông. Đối với người dùng nội bộ còn có thể liên kết với BkPay để giao dịch tiện lợi hơn.
+        \item Dịch vụ Quản lý bãi xe: hiển thị số lượng chỗ trống còn lại để người sử dụng dịch vụ có thể biết và xác định chỗ đậu. Đồng thời giữ thông tin về chỗ đang đậu của người dùng giúp tìm kiếm xe dễ dàng hơn khi lấy.
+        \item Dịch vụ IoT và Giám sát: bao gồm các cảm biến, thông báo chung để hiển thị cho người dùng cũng như nhân viên biết tình hĩnh bãi xe.
+    \end{itemize}
+    \item \textbf{Data Access \& Database:}
+    \begin{itemize}
+        \item Tầng truy cập dữ liệu (Data Access Layer): gửi yêu cầu truy xuất dữ liệu tới cơ sở dữ liệu.
+        \item Cơ sở dữ liệu (System Database): Nhận yêu cầu và tìm kiếm dữ liệu được lưu trữ và trả về nếu có.
+    \end{itemize}
+\end{enumerate}
