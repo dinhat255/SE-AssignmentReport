@@ -29,6 +29,11 @@
 .DS_Store
 Thumbs.db
 
-# VS Code settings (optional)
-.vscode/
+# VS Code settings
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+
+# Build output (artifact)
 main.pdf
