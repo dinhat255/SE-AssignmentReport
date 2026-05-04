@@ -1,12 +1,297 @@
-\subsection{\textbf{Class Diagram and Method Script}}
+\subsection{Class Diagram and Method Script}
 
-\subsubsection{\textbf{Overview of Class Diagram}}
+\subsubsection{Overview of Class Diagram}
+Tổng quan toàn bộ cấu trúc lớp và mối quan hệ giữa các thành phần được thể hiện trong Hình~\ref{fig:overall_system}. Các sơ đồ chi tiết theo từng nhóm chức năng được trình bày lần lượt từ Hình~\ref{fig:diagram_auth} đến Hình~\ref{fig:diagram_incident}.
 
-\subsubsection{\textbf{User Classes}}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Task3/overall_system.png}
+	\caption{Overall System — Parking Management System}
+	\label{fig:overall_system}
+\end{figure}
 
-\subsubsection{\textbf{Entity Classes}}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Task3/authentication.png}
+	\caption{Diagram 1 — Authentication (UC001)}
+	\label{fig:diagram_auth}
+\end{figure}
 
-\subsubsection{\textbf{Service Classes}}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Task3/payment.png}
+	\caption{Diagram 2 — Payment (UC004, UC005)}
+	\label{fig:diagram_payment}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Task3/parking_management.png}
+	\caption{Diagram 3 — Parking Management (UC002, UC003, UC006)}
+	\label{fig:diagram_parking}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Task3/admin_and_reporting.png}
+	\caption{Diagram 4 — Admin \& Reporting (UC007, UC008, UC009)}
+	\label{fig:diagram_admin}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Task3/incident_management.png}
+	\caption{Diagram 5 — Incident Management (UC010)}
+	\label{fig:diagram_incident}
+\end{figure}
+
+\subsubsection{User Classes}
+
+\noindent\textbf{User (Abstract)}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{id: String}: Mã định danh duy nhất của người dùng trong hệ thống.
+		\item \texttt{name: String}: Họ và tên đầy đủ của người dùng.
+		\item \texttt{email: String}: Địa chỉ email được dùng để xác thực và liên lạc.
+		\item \texttt{role: Role}: Vai trò của người dùng trong hệ thống, xác định quyền truy cập và chính sách áp dụng.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{login(): boolean}: Thực hiện đăng nhập vào hệ thống. Phương thức được gọi khi người dùng cung cấp thông tin xác thực; kết quả trả về \texttt{true} nếu đăng nhập thành công, ngược lại trả về \texttt{false}.
+		\item \texttt{logout(): void}: Hủy phiên làm việc hiện tại và xóa trạng thái đăng nhập của người dùng. Phương thức không trả về dữ liệu trực tiếp.
+		\item \texttt{getRole(): Role}: Trả về vai trò hiện tại của người dùng, phục vụ cho các thao tác kiểm tra quyền và phân luồng xử lý theo nhóm đối tượng.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{Student} (kế thừa từ \texttt{User})
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{studentId: String}: Mã số sinh viên dùng để định danh trong hệ thống quản lý học vụ và đối chiếu với \mbox{HCMUT\_DATACORE}.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{viewParkingHistory(): List<ParkingSession>}: Truy xuất danh sách các phiên gửi xe đã thực hiện của sinh viên. Kết quả trả về là danh sách \texttt{ParkingSession} được sắp xếp theo thời gian, phục vụ nhu cầu tra cứu lịch sử cá nhân.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{Lecturer} (kế thừa từ \texttt{User})
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{staffCode: String}: Mã cán bộ của giảng viên, dùng để xác thực và tra cứu thông tin từ \mbox{HCMUT\_DATACORE}.
+		\item \texttt{department: String}: Khoa hoặc bộ môn mà giảng viên trực thuộc.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{viewParkingHistory(): List<ParkingSession>}: Truy xuất lịch sử các phiên gửi xe của giảng viên. Kết quả trả về là danh sách \texttt{ParkingSession}, tương tự chức năng của \texttt{Student} nhưng áp dụng cho nhóm người dùng giảng viên.
+		\item \texttt{getParkingBenefit(): PricingPolicy}: Lấy chính sách giá ưu đãi đang áp dụng cho giảng viên. Phương thức trả về đối tượng \texttt{PricingPolicy} tương ứng với vai trò \texttt{LECTURER}, phản ánh các ưu đãi như số phút miễn phí hoặc mức giảm giá được hưởng.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{Staff} (kế thừa từ \texttt{User})
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{employeeId: String}: Mã nhân viên dùng để xác định danh tính và phân quyền vận hành trong hệ thống.
+		\item \texttt{shift: String}: Ca làm việc hiện tại của nhân viên, hỗ trợ quản lý lịch trực và phân công nhiệm vụ.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{reportIncident(desc: String): Incident}: Ghi nhận sự cố phát sinh trong ca trực. Nhân viên cung cấp mô tả sự cố; hệ thống tạo đối tượng \texttt{Incident} với thông tin ban đầu và trả về sự cố vừa được tạo.
+		\item \texttt{manualOverride(sessionId: String): void}: Thực hiện can thiệp thủ công vào một phiên gửi xe khi xảy ra sự cố hoặc trường hợp ngoại lệ cần xử lý trực tiếp. Phương thức không trả về dữ liệu trực tiếp.
+		\item \texttt{confirmPayment(sessionId: String): void}: Xác nhận thanh toán thủ công cho một phiên gửi xe, thường dùng khi hệ thống tự động gặp lỗi hoặc khách thanh toán tiền mặt tại quầy. Phương thức không trả về dữ liệu trực tiếp.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{Admin} (kế thừa từ \texttt{User})
+\begin{itemize}
+	\item \textbf{Attributes:} Không có thuộc tính riêng ngoài các thuộc tính kế thừa từ \texttt{User}.
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{configurePricing(): void}: Truy cập giao diện cấu hình chính sách giá, cho phép quản trị viên thiết lập hoặc thay đổi giá theo giờ, số phút miễn phí và mức giảm giá cho từng nhóm người dùng. Phương thức không trả về dữ liệu trực tiếp.
+		\item \texttt{viewReports(): Report}: Truy xuất và hiển thị báo cáo thống kê hệ thống theo loại và khoảng thời gian được chọn. Kết quả trả về là đối tượng \texttt{Report} chứa nội dung báo cáo tương ứng.
+		\item \texttt{manageUsers(): void}: Thực hiện các thao tác quản lý người dùng như tra cứu, đồng bộ danh sách và kiểm tra vai trò từ \mbox{HCMUT\_DATACORE}. Phương thức không trả về dữ liệu trực tiếp.
+	\end{itemize}
+\end{itemize}
+
+\subsubsection{Entity Classes}
+
+\noindent\textbf{Vehicle}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{licensePlate: String}: Biển số xe, dùng để định danh phương tiện trong hệ thống.
+		\item \texttt{type: String}: Loại phương tiện (xe máy, ô tô, xe đạp,...), phục vụ phân loại và áp dụng chính sách phù hợp.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{validate(): boolean}: Kiểm tra tính hợp lệ của thông tin phương tiện, bao gồm định dạng biển số và loại xe. Phương thức trả về \texttt{true} nếu dữ liệu hợp lệ, ngược lại trả về \texttt{false}.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{ParkingSession}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{id: String}: Mã định danh duy nhất của phiên gửi xe.
+		\item \texttt{userId: String}: Mã người dùng liên kết với phiên gửi xe; có thể để trống nếu là khách vãng lai chưa xác thực.
+		\item \texttt{vehicleId: String}: Mã phương tiện được ghi nhận trong phiên gửi xe.
+		\item \texttt{spotId: String}: Mã chỗ đỗ được phân công cho phiên gửi xe.
+		\item \texttt{cardId: String}: Mã thẻ (thẻ nội bộ hoặc thẻ vãng lai) được dùng để mở phiên.
+		\item \texttt{checkInImage: String}: Đường dẫn hoặc mã tham chiếu đến ảnh chụp phương tiện tại thời điểm vào bãi.
+		\item \texttt{checkInTime: DateTime}: Thời điểm xe vào bãi, dùng để tính thời lượng gửi xe.
+		\item \texttt{checkOutTime: DateTime}: Thời điểm xe ra khỏi bãi; được ghi nhận khi phiên kết thúc.
+		\item \texttt{status: SessionStatus}: Trạng thái hiện tại của phiên gửi xe, có thể là \texttt{ACTIVE}, \texttt{COMPLETED} hoặc \texttt{DISPUTED}.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{startSession(): void}: Khởi tạo và kích hoạt phiên gửi xe, ghi nhận thời gian vào bãi và chuyển trạng thái phiên sang \texttt{ACTIVE}. Phương thức không trả về dữ liệu trực tiếp.
+		\item \texttt{endSession(): void}: Kết thúc phiên gửi xe, ghi nhận thời gian ra và chuyển trạng thái phiên sang \texttt{COMPLETED}. Phương thức không trả về dữ liệu trực tiếp.
+		\item \texttt{calculateDuration(): double}: Tính thời lượng gửi xe dựa trên hiệu số giữa \texttt{checkOutTime} và \texttt{checkInTime}. Kết quả trả về là số giờ dạng \texttt{double}, phục vụ bước tính phí.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{ParkingSpot}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{id: String}: Mã định danh duy nhất của chỗ đỗ xe.
+		\item \texttt{zoneId: String}: Mã khu vực mà chỗ đỗ trực thuộc.
+		\item \texttt{status: SpotStatus}: Trạng thái hiện tại của chỗ đỗ, có thể là \texttt{AVAILABLE}, \texttt{OCCUPIED}, \texttt{RESERVED} hoặc \texttt{ERROR}.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{occupy(): void}: Đánh dấu chỗ đỗ là đang được sử dụng bằng cách chuyển trạng thái sang \texttt{OCCUPIED}. Phương thức được gọi khi một phiên gửi xe được gán vào chỗ đỗ này. Phương thức không trả về dữ liệu trực tiếp.
+		\item \texttt{release(): void}: Giải phóng chỗ đỗ sau khi phiên gửi xe kết thúc, chuyển trạng thái về \texttt{AVAILABLE} để sẵn sàng tiếp nhận xe tiếp theo. Phương thức không trả về dữ liệu trực tiếp.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{ParkingZone}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{id: String}: Mã định danh duy nhất của khu vực bãi xe.
+		\item \texttt{name: String}: Tên khu vực, dùng để hiển thị trên giao diện và bảng chỉ dẫn.
+		\item \texttt{totalSpots: int}: Tổng số chỗ đỗ trong khu vực.
+		\item \texttt{availableSpots: int}: Số chỗ đỗ còn trống tại thời điểm hiện tại.
+		\item \texttt{status: ZoneStatus}: Trạng thái tổng thể của khu vực, có thể là \texttt{AVAILABLE}, \texttt{NEARLY\_FULL} hoặc \texttt{FULL}.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{getAvailableSpots(): List<ParkingSpot>}: Trả về danh sách các chỗ đỗ còn trống trong khu vực, phục vụ bước phân công chỗ đỗ khi tạo phiên gửi xe mới.
+		\item \texttt{updateStatus(): void}: Cập nhật trạng thái khu vực dựa trên số chỗ trống hiện tại so với tổng số chỗ. Phương thức không trả về dữ liệu trực tiếp.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{VisitorCard}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{cardId: String}: Mã định danh duy nhất của thẻ vãng lai.
+		\item \texttt{status: CardStatus}: Trạng thái hiện tại của thẻ, có thể là \texttt{AVAILABLE}, \texttt{IN\_USE} hoặc \texttt{LOCKED}.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{assignToSession(session: ParkingSession): void}: Liên kết thẻ vãng lai với một phiên gửi xe cụ thể và chuyển trạng thái thẻ sang \texttt{IN\_USE}. Phương thức không trả về dữ liệu trực tiếp.
+		\item \texttt{reset(): void}: Đặt lại trạng thái thẻ về \texttt{AVAILABLE} sau khi phiên gửi xe kết thúc và thẻ được thu hồi. Phương thức không trả về dữ liệu trực tiếp.
+		\item \texttt{lock(): void}: Khóa thẻ khi phát hiện sự cố hoặc thẻ bị giữ quá thời gian cho phép, chuyển trạng thái sang \texttt{LOCKED}. Phương thức không trả về dữ liệu trực tiếp.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{Payment}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{id: String}: Mã định danh duy nhất của giao dịch thanh toán.
+		\item \texttt{sessionId: String}: Mã phiên gửi xe mà giao dịch này liên kết đến.
+		\item \texttt{amount: double}: Số tiền cần thanh toán, được tính dựa trên thời lượng gửi xe và chính sách giá áp dụng.
+		\item \texttt{status: PaymentStatus}: Trạng thái giao dịch, có thể là \texttt{PENDING}, \texttt{SUCCESS}, \texttt{FAILED} hoặc \texttt{CANCELLED}.
+		\item \texttt{method: PaymentMethod}: Phương thức thanh toán được sử dụng, có thể là \texttt{CASH}, \texttt{QR} hoặc \texttt{PREPAID}.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{process(): boolean}: Thực hiện xử lý giao dịch thanh toán theo phương thức đã chọn. Phương thức trả về \texttt{true} nếu giao dịch thành công, ngược lại trả về \texttt{false}.
+		\item \texttt{validate(): boolean}: Kiểm tra tính hợp lệ của thông tin giao dịch trước khi xử lý, bao gồm mã phiên, số tiền và phương thức thanh toán. Phương thức trả về \texttt{true} nếu dữ liệu hợp lệ, ngược lại trả về \texttt{false}.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{PrepaidPackage}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{id: String}: Mã định danh duy nhất của gói trả trước.
+		\item \texttt{name: String}: Tên gói trả trước, dùng để hiển thị và phân biệt giữa các gói.
+		\item \texttt{durationDays: int}: Số ngày hiệu lực của gói kể từ ngày kích hoạt.
+		\item \texttt{price: double}: Giá trị của gói trả trước tính bằng đồng tiền hệ thống.
+		\item \texttt{validFrom: DateTime}: Thời điểm bắt đầu hiệu lực của gói.
+		\item \texttt{validTo: DateTime}: Thời điểm hết hiệu lực của gói.
+		\item \texttt{userId: String}: Mã người dùng sở hữu gói trả trước này.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{isActive(): boolean}: Kiểm tra xem gói trả trước có đang trong thời hạn hiệu lực hay không, dựa trên thời gian hiện tại so với \texttt{validFrom} và \texttt{validTo}. Phương thức trả về \texttt{true} nếu gói còn hiệu lực.
+		\item \texttt{extend(pkg: PrepaidPackage): void}: Gia hạn gói trả trước bằng cách cộng thêm thời gian từ gói mới vào thời điểm hết hạn hiện tại. Phương thức không trả về dữ liệu trực tiếp.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{PricingPolicy}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{id: String}: Mã định danh duy nhất của chính sách giá.
+		\item \texttt{targetGroup: Role}: Nhóm người dùng được áp dụng chính sách này, ví dụ \texttt{STUDENT}, \texttt{LECTURER}, \texttt{STAFF} hoặc \texttt{VISITOR}.
+		\item \texttt{pricePerHour: double}: Mức giá tính theo giờ áp dụng cho nhóm người dùng tương ứng.
+		\item \texttt{freeMinutes: int}: Số phút miễn phí được hưởng trước khi bắt đầu tính phí.
+		\item \texttt{discountPercent: double}: Phần trăm giảm giá áp dụng cho nhóm đối tượng được ưu đãi.
+		\item \texttt{effectiveFrom: DateTime}: Thời điểm chính sách giá bắt đầu có hiệu lực.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{calculateFee(duration: double): double}: Tính phí gửi xe dựa trên thời lượng đầu vào, áp dụng số phút miễn phí, giá theo giờ và phần trăm giảm giá theo chính sách hiện hành. Kết quả trả về là số tiền cần thanh toán dạng \texttt{double}.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{Report}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{id: String}: Mã định danh duy nhất của báo cáo.
+		\item \texttt{type: ReportType}: Loại báo cáo, có thể là \texttt{REVENUE}, \texttt{USAGE} hoặc \texttt{FREQUENCY}.
+		\item \texttt{dateRange: DateRange}: Khoảng thời gian mà báo cáo bao phủ.
+		\item \texttt{zone: String}: Khu vực bãi xe được lọc trong báo cáo; để trống nếu báo cáo bao gồm toàn bộ hệ thống.
+		\item \texttt{format: String}: Định dạng xuất báo cáo, ví dụ PDF hoặc Excel.
+		\item \texttt{generatedBy: String}: Mã người dùng đã tạo báo cáo.
+		\item \texttt{createdAt: DateTime}: Thời điểm báo cáo được tạo.
+		\item \texttt{content: String}: Nội dung báo cáo ở dạng văn bản hoặc dữ liệu đã được tổng hợp.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{generate(): void}: Tổng hợp dữ liệu từ hệ thống theo loại báo cáo và khoảng thời gian, điền nội dung vào thuộc tính \texttt{content}. Phương thức không trả về dữ liệu trực tiếp.
+		\item \texttt{export(format: String): File}: Xuất báo cáo thành tệp theo định dạng yêu cầu. Kết quả trả về là đối tượng \texttt{File} để người dùng tải xuống hoặc lưu trữ.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{Incident}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{id: String}: Mã định danh duy nhất của sự cố.
+		\item \texttt{type: IncidentType}: Loại sự cố, có thể là \texttt{HARDWARE} hoặc \texttt{ON\_SITE}.
+		\item \texttt{description: String}: Mô tả chi tiết nội dung sự cố do nhân viên hoặc hệ thống ghi nhận.
+		\item \texttt{status: IncidentStatus}: Trạng thái xử lý sự cố, có thể là \texttt{PENDING}, \texttt{IN\_PROGRESS} hoặc \texttt{RESOLVED}.
+		\item \texttt{reportedBy: String}: Mã người dùng đã báo cáo sự cố.
+		\item \texttt{createdAt: DateTime}: Thời điểm sự cố được ghi nhận vào hệ thống.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{resolve(): void}: Chuyển trạng thái sự cố sang \texttt{RESOLVED} sau khi nhân viên hoặc quản trị viên xác nhận đã xử lý xong. Phương thức không trả về dữ liệu trực tiếp.
+		\item \texttt{notifyAdmin(): void}: Gửi thông báo đến quản trị viên về sự cố, bao gồm loại sự cố, mô tả, thời điểm phát sinh và trạng thái hiện tại. Phương thức không trả về dữ liệu trực tiếp.
+	\end{itemize}
+\end{itemize}
+
+\subsubsection{Service Classes}
 
 \noindent\textbf{AuthService}
 \begin{itemize}
@@ -55,7 +340,7 @@
     \item \texttt{suggestZone(role: Role): ParkingZone}: Đề xuất khu vực đỗ xe phù hợp dựa trên vai trò người dùng và trạng thái hiện tại của các khu vực. Hệ thống có thể ưu tiên khu vực dành cho nhóm người dùng tương ứng hoặc khu vực thay thế khi khu ưu tiên đã đầy. Kết quả trả về là \texttt{ParkingZone} được đề xuất.
 \end{itemize}
 
-\subsubsection{\textbf{Controller Classes}}
+\subsubsection{Controller Classes}
 
 \noindent\textbf{AuthController}
 \begin{itemize}
@@ -95,7 +380,7 @@
     \item \texttt{resolveIncident(): void}: Tiếp nhận yêu cầu xử lý hoặc đóng sự cố. Controller lấy mã sự cố, gọi \texttt{IncidentService.resolveIncident()} và cập nhật trạng thái sự cố trên giao diện nếu thao tác hợp lệ.
 \end{itemize}
 
-\subsubsection{\textbf{External System Classes}}
+\subsubsection{External System Classes}
 
 \noindent\textbf{SSOService}
 \begin{itemize}
@@ -124,6 +409,123 @@
     \item \texttt{syncOfflineData(): void}: Đồng bộ dữ liệu được lưu tạm trong gateway khi kết nối với hệ thống trung tâm bị gián đoạn. Sau khi kết nối được khôi phục, gateway gửi lại dữ liệu chưa đồng bộ như trạng thái cảm biến, sự kiện vào ra hoặc bản ghi thiết bị. Phương thức không trả về dữ liệu trực tiếp.
 \end{itemize}
 
-\subsubsection{\textbf{Hardware/IoT Classes}}
+\subsubsection{Hardware/IoT Classes}
 
-\subsubsection{\textbf{Enumerations}}
+\noindent\textbf{Sensor (Abstract)}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{id: String}: Mã định danh duy nhất của thiết bị cảm biến trong hệ thống IoT.
+		\item \texttt{status: String}: Trạng thái hoạt động hiện tại của cảm biến, ví dụ đang hoạt động, lỗi hoặc mất kết nối.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{readData(): String}: Đọc và trả về dữ liệu thô từ cảm biến. Phương thức được định nghĩa tại lớp trừu tượng và được các lớp con ghi đè để trả về dữ liệu phù hợp với loại thiết bị tương ứng.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{RFIDReader} (kế thừa từ \texttt{Sensor})
+\begin{itemize}
+	\item \textbf{Attributes:} Kế thừa toàn bộ thuộc tính từ \texttt{Sensor}, không có thuộc tính riêng.
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{readCard(): String}: Đọc thông tin từ thẻ RFID khi người dùng quẹt thẻ tại cổng vào hoặc cổng ra. Kết quả trả về là chuỗi mã thẻ, được chuyển tiếp đến \texttt{ParkingService} để tạo hoặc kết thúc phiên gửi xe.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{Camera} (kế thừa từ \texttt{Sensor})
+\begin{itemize}
+	\item \textbf{Attributes:} Kế thừa toàn bộ thuộc tính từ \texttt{Sensor}, không có thuộc tính riêng.
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{captureImage(): Image}: Chụp ảnh phương tiện tại thời điểm xe vào bãi hoặc ra khỏi bãi. Kết quả trả về là đối tượng \texttt{Image}, được lưu trữ làm bằng chứng và liên kết với phiên gửi xe tương ứng thông qua thuộc tính \texttt{checkInImage} của \texttt{ParkingSession}.
+	\end{itemize}
+\end{itemize}
+
+\noindent\textbf{Barrier}
+\begin{itemize}
+	\item \textbf{Attributes:}
+	\begin{itemize}
+		\item \texttt{status: String}: Trạng thái hiện tại của thanh chắn, ví dụ đang mở, đang đóng hoặc lỗi.
+	\end{itemize}
+	\item \textbf{Methods:}
+	\begin{itemize}
+		\item \texttt{open(): void}: Gửi lệnh nâng thanh chắn để cho phép phương tiện vào hoặc ra khỏi bãi xe. Phương thức thường được gọi sau khi hệ thống xác nhận phiên gửi xe hợp lệ hoặc thanh toán thành công. Phương thức không trả về dữ liệu trực tiếp.
+		\item \texttt{close(): void}: Gửi lệnh hạ thanh chắn sau khi phương tiện đã đi qua cổng. Phương thức không trả về dữ liệu trực tiếp.
+	\end{itemize}
+\end{itemize}
+
+\subsubsection{Enumerations}
+
+\noindent\textbf{Role}
+\begin{itemize}
+	\item \texttt{STUDENT}: Sinh viên đang theo học tại trường, được áp dụng chính sách giá và quyền truy cập dành riêng cho nhóm này.
+	\item \texttt{LECTURER}: Giảng viên hoặc cán bộ giảng dạy, được hưởng ưu đãi về phí gửi xe so với khách vãng lai.
+	\item \texttt{STAFF}: Nhân viên vận hành bãi xe, có quyền thực hiện các thao tác trực tiếp như xác nhận thanh toán và ghi nhận sự cố.
+	\item \texttt{ADMIN}: Quản trị viên hệ thống, có toàn quyền cấu hình chính sách, xem báo cáo và quản lý người dùng.
+	\item \texttt{VISITOR}: Khách vãng lai không thuộc hệ thống nội bộ, sử dụng thẻ tạm thời và áp dụng mức giá tiêu chuẩn.
+\end{itemize}
+
+\noindent\textbf{SessionStatus}
+\begin{itemize}
+	\item \texttt{ACTIVE}: Phiên gửi xe đang diễn ra, xe đã vào bãi và chưa ra khỏi cổng.
+	\item \texttt{COMPLETED}: Phiên gửi xe đã kết thúc bình thường, xe đã ra khỏi bãi và thanh toán được xử lý.
+	\item \texttt{DISPUTED}: Phiên gửi xe đang có tranh chấp hoặc bất thường, cần nhân viên hoặc quản trị viên xem xét và xử lý thủ công.
+\end{itemize}
+
+\noindent\textbf{SpotStatus}
+\begin{itemize}
+	\item \texttt{AVAILABLE}: Chỗ đỗ đang trống và sẵn sàng tiếp nhận phương tiện mới.
+	\item \texttt{OCCUPIED}: Chỗ đỗ đang có phương tiện, liên kết với một phiên gửi xe đang hoạt động.
+	\item \texttt{RESERVED}: Chỗ đỗ đã được giữ tạm thời trong quá trình tạo phiên gửi xe, chưa chính thức sử dụng.
+	\item \texttt{ERROR}: Chỗ đỗ gặp sự cố kỹ thuật hoặc dữ liệu không nhất quán, cần kiểm tra trước khi đưa vào sử dụng.
+\end{itemize}
+
+\noindent\textbf{ZoneStatus}
+\begin{itemize}
+	\item \texttt{AVAILABLE}: Khu vực còn nhiều chỗ trống, hệ thống có thể tiếp tục phân công chỗ đỗ bình thường.
+	\item \texttt{NEARLY\_FULL}: Khu vực gần đầy, số chỗ trống còn lại ở mức thấp; hệ thống có thể ưu tiên đề xuất khu vực khác.
+	\item \texttt{FULL}: Khu vực đã hết chỗ, không thể tiếp nhận thêm phương tiện cho đến khi có chỗ được giải phóng.
+\end{itemize}
+
+\noindent\textbf{PaymentStatus}
+\begin{itemize}
+	\item \texttt{PENDING}: Giao dịch thanh toán đã được tạo nhưng chưa hoàn tất xử lý.
+	\item \texttt{SUCCESS}: Giao dịch thanh toán đã được xử lý thành công và xác nhận bởi hệ thống.
+	\item \texttt{FAILED}: Giao dịch thanh toán thất bại do lỗi kỹ thuật, không đủ số dư hoặc hết thời gian chờ.
+	\item \texttt{CANCELLED}: Giao dịch thanh toán đã bị hủy theo yêu cầu của người dùng hoặc do hệ thống phát hiện phiên không hợp lệ.
+\end{itemize}
+
+\noindent\textbf{PaymentMethod}
+\begin{itemize}
+	\item \texttt{CASH}: Thanh toán tiền mặt trực tiếp tại quầy hoặc cổng ra, được nhân viên xác nhận thủ công.
+	\item \texttt{QR}: Thanh toán qua mã QR thông qua hệ thống \mbox{BKPay}, phù hợp cho cả người dùng nội bộ và khách vãng lai.
+	\item \texttt{PREPAID}: Thanh toán bằng gói trả trước đã đăng ký, áp dụng cho người dùng nội bộ có gói còn hiệu lực.
+\end{itemize}
+
+\noindent\textbf{CardStatus}
+\begin{itemize}
+	\item \texttt{AVAILABLE}: Thẻ vãng lai đang sẵn sàng, chưa được gán cho phiên gửi xe nào.
+	\item \texttt{IN\_USE}: Thẻ đang được liên kết với một phiên gửi xe đang hoạt động.
+	\item \texttt{LOCKED}: Thẻ bị khóa do phát hiện sự cố hoặc giữ thẻ quá thời gian quy định, cần nhân viên xử lý trước khi tái sử dụng.
+\end{itemize}
+
+\noindent\textbf{IncidentType}
+\begin{itemize}
+	\item \texttt{HARDWARE}: Sự cố liên quan đến thiết bị vật lý như đầu đọc thẻ RFID, camera, barrier hoặc IoT Gateway.
+	\item \texttt{ON\_SITE}: Sự cố phát sinh trực tiếp tại bãi xe như tranh chấp chỗ đỗ, lỗi thanh toán hoặc tình huống cần nhân viên can thiệp.
+\end{itemize}
+
+\noindent\textbf{IncidentStatus}
+\begin{itemize}
+	\item \texttt{PENDING}: Sự cố vừa được ghi nhận, chưa có nhân viên hoặc quản trị viên tiếp nhận xử lý.
+	\item \texttt{IN\_PROGRESS}: Sự cố đang được xử lý bởi nhân viên hoặc quản trị viên có thẩm quyền.
+	\item \texttt{RESOLVED}: Sự cố đã được giải quyết hoàn toàn và đóng lại trong hệ thống.
+\end{itemize}
+
+\noindent\textbf{ReportType}
+\begin{itemize}
+	\item \texttt{REVENUE}: Báo cáo doanh thu, tổng hợp số tiền thu được từ các giao dịch thanh toán trong khoảng thời gian được chọn.
+	\item \texttt{USAGE}: Báo cáo tình hình sử dụng bãi xe, bao gồm số lượt gửi xe, tỷ lệ lấp đầy và phân bố theo khu vực.
+	\item \texttt{FREQUENCY}: Báo cáo tần suất sử dụng, phân tích mức độ hoạt động của bãi xe theo khung giờ, ngày hoặc nhóm người dùng.
+\end{itemize}
