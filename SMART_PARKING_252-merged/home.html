@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Parking</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f8fafc;
+}
+
+/* HEADER */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background: white;
+}
+
+header h2 {
+  margin: 0;
+}
+
+nav span {
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+/* MAIN */
+.container {
+  display: flex;
+  padding: 60px;
+}
+
+/* LEFT */
+.left {
+  width: 50%;
+}
+
+.left h1 {
+  font-size: 42px;
+}
+
+.left p {
+  color: gray;
+}
+
+button {
+  background: #3B82F6;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* RIGHT GRID */
+.right {
+  width: 50%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, 30px);
+  gap: 10px;
+}
+
+.slot {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+}
+
+.green { background: #22C55E; }
+.red { background: #EF4444; }
+
+/* LOGIN MODAL */
+.login {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  display: none;
+  width: 300px;
+}
+
+.login input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h2>Smart Parking System</h2>
+  <nav>
+    <span onclick="openLogin()">Login</span>
+    <span>Register</span>
+  </nav>
+</header>
+
+<div class="container">
+
+  <div class="left">
+    <h1>Smart Parking for HCMUT</h1>
+    <p>Real-time parking availability and smart access</p>
+    <button onclick="openLogin()">Get Started</button>
+  </div>
+
+  <div class="right">
+    <div class="grid">
+      <div class="slot green"></div>
+      <div class="slot red"></div>
+      <div class="slot green"></div>
+      <div class="slot green"></div>
+      <div class="slot red"></div>
+      <div class="slot green"></div>
+
+      <div class="slot red"></div>
+      <div class="slot green"></div>
+      <div class="slot green"></div>
+      <div class="slot red"></div>
+      <div class="slot green"></div>
+      <div class="slot green"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- LOGIN POPUP -->
+<div class="login" id="loginBox">
+  <h3>Login</h3>
+  <input placeholder="Email">
+  <input type="password" placeholder="Password">
+  <button style="width:100%">Login</button>
+</div>
+
+<script>
+function openLogin() {
+  document.getElementById("loginBox").style.display = "block";
+}
+</script>
+
+</body>
+</html>
