@@ -1,18 +1,35 @@
+import { useEffect, useState } from 'react';
 import { Mail, Phone, Edit, Bell, Receipt } from 'lucide-react';
+import { getStoredRole, type ApiUser } from '../../api/client';
+import { userApi } from '../../api/userApi';
 
 export function Profile() {
-  const accountRole = localStorage.getItem('accountRole') || 'student';
+  const [apiProfile, setApiProfile] = useState<ApiUser | null>(null);
+  const accountRole = apiProfile?.role || getStoredRole('student');
   const isAdmin = accountRole === 'admin';
   const isEmployee = accountRole === 'employee';
   const isLecturer = accountRole === 'lecturer';
 
-  const displayName = isAdmin
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const user = await userApi.getMe();
+        if (mounted) setApiProfile(user);
+      } catch (err) {
+        console.warn('User API unavailable, falling back to local profile.', err);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const displayName = apiProfile?.fullName || (isAdmin
     ? 'Nguyễn Văn Quản'
     : isEmployee
       ? 'Lê Thị Mai'
       : isLecturer
         ? 'Trần Thị Lan'
-        : 'Minh Le';
+        : 'Minh Le');
 
   const displayRole = isAdmin
     ? 'Quản trị viên'
@@ -22,33 +39,33 @@ export function Profile() {
         ? 'Giảng viên'
         : 'Sinh viên';
 
-  const displayId = isAdmin
+  const displayId = apiProfile?.cardId || apiProfile?.id || (isAdmin
     ? 'ADM001'
     : isEmployee
       ? 'EMP002'
       : isLecturer
         ? 'GV001'
-        : '2011234';
+        : '2011234');
 
-  const displayEmail = isAdmin
+  const displayEmail = apiProfile?.email || (isAdmin
     ? 'admin@smartparking.vn'
     : isEmployee
       ? 'mai.le@smartparking.vn'
       : isLecturer
         ? 'lan.tran@hcmut.edu.vn'
-        : 'minh.le@hcmut.edu.vn';
+        : 'minh.le@hcmut.edu.vn');
 
-  const displayPhone = isAdmin
+  const displayPhone = apiProfile?.phone || (isAdmin
     ? '0987 654 321'
     : isEmployee
       ? '0912 345 678'
-      : '0123 456 789';
+      : '0123 456 789');
 
-  const displayDepartment = isAdmin
+  const displayDepartment = apiProfile?.department || (isAdmin
     ? 'Trung tâm điều hành'
     : isEmployee
       ? 'Bộ phận vận hành bãi xe'
-      : 'Khoa Kỹ thuật Máy tính';
+      : 'Khoa Kỹ thuật Máy tính');
 
   return (
     <div className="p-6">
@@ -115,7 +132,7 @@ export function Profile() {
               <div>
                 <label className="text-sm text-gray-700">Biển số xe</label>
                 <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                  <span>59A-123.45</span>
+                  <span>{apiProfile?.vehiclePlate || '59A-123.45'}</span>
                   <Edit className="w-4 h-4 text-blue-600" />
                 </div>
               </div>
@@ -195,3 +212,4 @@ export function Profile() {
     </div>
   );
 }
+

@@ -1,12 +1,13 @@
 import { Link, useLocation } from 'react-router';
 import { Home, ParkingSquare, Clock, CreditCard, User, HelpCircle, LogOut, Users, Wrench } from 'lucide-react';
 import logoImage from "/src/assets/01_logobachkhoa.png";
+import { getStoredRole } from '../api/client';
 
 type AccountRole = 'student' | 'lecturer' | 'admin' | 'employee';
 
 export function Sidebar() {
   const location = useLocation();
-  const accountRole = (localStorage.getItem('accountRole') || 'student') as AccountRole;
+  const accountRole = getStoredRole('student') as AccountRole;
 
   const menuItems = [
     { icon: Home, label: 'Dashboard', path: '/dashboard', allowedRoles: ['student', 'lecturer', 'admin', 'employee'] },

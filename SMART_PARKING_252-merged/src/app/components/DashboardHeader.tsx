@@ -1,4 +1,5 @@
 import { Search, Bell, ChevronDown } from 'lucide-react';
+import { getStoredRole, getStoredUser } from '../api/client';
 
 interface DashboardHeaderProps {
   userName?: string;
@@ -8,8 +9,9 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ userName = 'Minh Le', userRole = 'Student', userId = '2311234' }: DashboardHeaderProps) {
   const userType = localStorage.getItem('userType') || 'hcmut';
-  const accountRole = localStorage.getItem('accountRole') || 'student';
-  const storedUserName = localStorage.getItem('userName') || userName || 'Minh Le';
+  const storedUser = getStoredUser();
+  const accountRole = getStoredRole('student');
+  const storedUserName = storedUser?.fullName || localStorage.getItem('userName') || userName || 'Minh Le';
 
   const displayRole = userType === 'hcmut'
     ? (accountRole === 'lecturer' ? 'Giảng viên' : 'Sinh viên')

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getHistory } from '../../../mocks/mockData';
+import { getStoredRole, getStoredUserId } from '../../api/client';
+import { studentApi } from '../../api/studentApi';
 
 interface HistoryEntry {
   date: string;
@@ -14,6 +16,7 @@ interface HistoryEntry {
 }
 
 export function MyHistory() {
+  const accountRole = getStoredRole('student');
   const [selectedPeriod, setSelectedPeriod] = useState('Tháng này');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -27,21 +30,34 @@ export function MyHistory() {
     (async () => {
       try {
         setLoading(true);
-        const res = await getHistory(currentPage, itemsPerPage);
+        const res = accountRole === 'student'
+          ? await studentApi.getParkingHistory(getStoredUserId(), currentPage, itemsPerPage)
+          : await getHistory(currentPage, itemsPerPage);
         if (!mounted) return;
-        setHistoryData(res.data as HistoryEntry[]);
+        setHistoryData(res.data.map((entry: any) => ({
+          ...entry,
+          fee: typeof entry.fee === 'number' ? `${entry.fee.toLocaleString()} VND` : entry.fee,
+          cardType: entry.cardType || 'Tháº» thĂ¡ng',
+          status: 'active',
+        })) as HistoryEntry[]);
         setTotal(res.total);
       } catch (err) {
         if (!mounted) return;
-        // show minimal error in UI
-        setHistoryData([]);
-        setTotal(0);
+        try {
+          const res = await getHistory(currentPage, itemsPerPage);
+          if (!mounted) return;
+          setHistoryData(res.data as HistoryEntry[]);
+          setTotal(res.total);
+        } catch {
+          setHistoryData([]);
+          setTotal(0);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
     })();
     return () => { mounted = false; };
-  }, [currentPage]);
+  }, [accountRole, currentPage]);
 
   const totalPages = Math.ceil(total / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;

@@ -2,11 +2,15 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { Car, Calendar, CreditCard, ArrowRight, Clock, CheckCircle2 } from 'lucide-react';
 import { getLoginFrequency, getParkingMap } from '../../../mocks/mockData';
+import { getStoredRole, getStoredUserId } from '../../api/client';
+import { lecturerApi, type LecturerQuota } from '../../api/lecturerApi';
+import { parkingApi, type ParkingMapResponse } from '../../api/parkingApi';
+import { studentApi, type StudentProfile } from '../../api/studentApi';
 
 type ParkingSlotStatus = 'available' | 'full';
 
 export function Dashboard() {
-  const accountRole = localStorage.getItem('accountRole') || 'student';
+  const accountRole = getStoredRole('student');
   const isAdmin = accountRole === 'admin';
   const isEmployee = accountRole === 'employee';
   const isLecturer = accountRole === 'lecturer';
@@ -14,8 +18,9 @@ export function Dashboard() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [walletBalance] = useState(20000);
-  const [parkingData] = useState({
+  const [studentProfile, setStudentProfile] = useState<StudentProfile | null>(null);
+  const [lecturerQuota, setLecturerQuota] = useState<LecturerQuota | null>(null);
+  const [parkingData, setParkingData] = useState({
     available: 120,
     total: 200,
     percentage: 60,
@@ -23,18 +28,70 @@ export function Dashboard() {
 
   const [parkingSlots, setParkingSlots] = useState<ParkingSlotStatus[][]>([]);
 
+  const walletBalance = studentProfile?.walletBalance ?? 20000;
+  const subscriptionExpiry =
+    studentProfile?.subscription?.validTo ||
+    studentProfile?.subscription?.expiresAt ||
+    '30/04/2026';
+  const lecturerUsed = lecturerQuota?.currentUsage ?? 15;
+  const lecturerLimit = lecturerQuota?.monthlyLimit ?? 50;
+  const lecturerPercent = lecturerLimit > 0 ? Math.min(100, (lecturerUsed / lecturerLimit) * 100) : 0;
+
+  const mapParkingSlots = (map: ParkingMapResponse): ParkingSlotStatus[][] => {
+    const rows = ['A', 'B', 'C', 'D'];
+    return rows.map((row) =>
+      Array.from({ length: 10 }, (_, colIndex) => {
+        const id = `${row}${String(colIndex + 1).padStart(2, '0')}`;
+        const spot = map.spots.find((item) => item.id === id);
+        return spot?.status === 'AVAILABLE' ? 'available' : 'full';
+      })
+    );
+  };
+
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const map = await getParkingMap();
-        if (mounted) setParkingSlots(map as any);
+        try {
+          const map = await parkingApi.getMap();
+          if (!mounted) return;
+          setParkingSlots(mapParkingSlots(map));
+          if (map.summary) {
+            setParkingData({
+              available: map.summary.available,
+              total: map.summary.total,
+              percentage: map.summary.total ? Math.round((map.summary.available / map.summary.total) * 100) : 0,
+            });
+          }
+        } catch (err) {
+          console.warn('Parking API unavailable, falling back to mock dashboard map.', err);
+          const map = await getParkingMap();
+          if (mounted) setParkingSlots(map as any);
+        }
       } catch (err) {
         if (mounted) setError('Không lấy được sơ đồ bãi đậu xe.');
       }
     })();
     return () => { mounted = false; };
   }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        if (isStudent) {
+          const profile = await studentApi.getProfile();
+          if (mounted) setStudentProfile(profile);
+        } else if (isLecturer) {
+          const quota = await lecturerApi.getQuota(getStoredUserId());
+          if (mounted) setLecturerQuota(quota);
+        }
+      } catch (err) {
+        console.warn('Role dashboard API unavailable, keeping hardcoded dashboard values.', err);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [isLecturer, isStudent]);
 
   const [loginFrequency, setLoginFrequency] = useState<{ month: string; count: number }[]>([]);
   const [maxCount, setMaxCount] = useState(1);
@@ -184,7 +241,7 @@ export function Dashboard() {
                 </div>
 
                 <div className="flex items-center justify-between text-sm text-gray-600">
-                  <span>Đến 30/04/2026</span>
+                  <span>Đến {subscriptionExpiry}</span>
                   <button className="px-3 py-1 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     Gia hạn
                   </button>
@@ -198,14 +255,14 @@ export function Dashboard() {
                   </div>
                   <div>
                     <div className="text-sm text-gray-600">Giới hạn truy cập</div>
-                    <div className="text-2xl font-bold text-purple-600">15 / 50</div>
+                    <div className="text-2xl font-bold text-purple-600">{lecturerUsed} / {lecturerLimit}</div>
                   </div>
                 </div>
 
                 <div className="text-sm text-purple-600 mb-2">đã sử dụng</div>
 
                 <div className="w-full bg-purple-200 rounded-full h-2">
-                  <div className="bg-purple-600 h-2 rounded-full" style={{ width: '30%' }} />
+                  <div className="bg-purple-600 h-2 rounded-full" style={{ width: `${lecturerPercent}%` }} />
                 </div>
               </div>
             ) : (

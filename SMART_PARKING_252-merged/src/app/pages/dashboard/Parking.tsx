@@ -1,5 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Filter, RefreshCw, Car, Clock, DollarSign } from 'lucide-react';
+import { getStoredUserId } from '../../api/client';
+import { parkingApi, type ParkingMapResponse, type ParkingSpotDto } from '../../api/parkingApi';
 
 type Zone = 'A' | 'B' | 'C' | 'D';
 type SlotStatus = 'available' | 'full' | 'yours';
@@ -13,7 +15,7 @@ export function Parking() {
   const [selectedZone, setSelectedZone] = useState<Zone>('A');
   const [selectedSlot, setSelectedSlot] = useState<string | null>('A04');
 
-  const parkingSlotsByZone = useMemo<Record<Zone, ParkingSlot[][]>>(() => {
+  const fallbackParkingSlotsByZone = useMemo<Record<Zone, ParkingSlot[][]>>(() => {
     const rows = ['A', 'B', 'C', 'D'] as const;
     const cols = 10;
 
@@ -44,6 +46,8 @@ export function Parking() {
     };
   }, []);
 
+  const [apiSlotsByZone, setApiSlotsByZone] = useState<Record<Zone, ParkingSlot[][]> | null>(null);
+  const parkingSlotsByZone = apiSlotsByZone || fallbackParkingSlotsByZone;
   const parkingSlots = parkingSlotsByZone[selectedZone];
   const zones: Zone[] = ['A', 'B', 'C', 'D'];
 
@@ -58,6 +62,41 @@ export function Parking() {
   const [checkInTime, setCheckInTime] = useState<string | null>(null);
   const [checkOutTime, setCheckOutTime] = useState<string | null>(null);
   const [assignedSlot, setAssignedSlot] = useState<string | null>(null);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+
+  const mapSpotStatus = (spot?: ParkingSpotDto): SlotStatus => {
+    if (spot?.occupiedByCurrentUser) return 'yours';
+    return spot?.status === 'AVAILABLE' ? 'available' : 'full';
+  };
+
+  const buildSlotsFromApi = (map: ParkingMapResponse): Record<Zone, ParkingSlot[][]> => {
+    const zones: Zone[] = ['A', 'B', 'C', 'D'];
+    const rows = ['A', 'B', 'C', 'D'] as const;
+    return zones.reduce((acc, zone) => {
+      acc[zone] = rows.map((row) =>
+        Array.from({ length: 10 }, (_, colIndex) => {
+          const id = `${row}${String(colIndex + 1).padStart(2, '0')}`;
+          const spot = map.spots.find((item) => item.zone === zone && item.id === id);
+          return { id, status: mapSpotStatus(spot) };
+        })
+      );
+      return acc;
+    }, {} as Record<Zone, ParkingSlot[][]>);
+  };
+
+  const loadParkingMap = async () => {
+    try {
+      const map = await parkingApi.getMap();
+      setApiSlotsByZone(buildSlotsFromApi(map));
+    } catch (err) {
+      console.warn('Parking API unavailable, keeping local parking map.', err);
+      setApiSlotsByZone(null);
+    }
+  };
+
+  useEffect(() => {
+    void loadParkingMap();
+  }, []);
 
   const generateRandomSlot = () => {
     const zones = ['A', 'B', 'C', 'D'];
@@ -92,17 +131,46 @@ export function Parking() {
     setAssignedSlot(null);
   };
 
-  const handleCheckIn = () => {
+  const applyLocalCheckIn = (slot?: string, sessionId?: string, timeIn?: string) => {
     setCheckedIn(true);
-    setCheckInTime(new Date().toLocaleTimeString('vi-VN'));
+    setCheckInTime(timeIn || new Date().toLocaleTimeString('vi-VN'));
     setCheckOutTime(null);
-    setAssignedSlot(generateRandomSlot());
+    setAssignedSlot(slot || generateRandomSlot());
+    setActiveSessionId(sessionId || null);
   };
 
-  const handleCheckOut = () => {
+  const handleCheckIn = async () => {
+    try {
+      const result = await parkingApi.checkIn({
+        userId: getStoredUserId(),
+        cardId: scannedData?.mssv,
+        visitorCardId: scannedData?.cardId,
+        vehiclePlate: scannedData?.plate,
+      });
+      applyLocalCheckIn(result.assignedSlot, result.sessionId, result.timeIn);
+      void loadParkingMap();
+    } catch (err) {
+      console.warn('Check-in API unavailable, falling back to local state.', err);
+      applyLocalCheckIn();
+    }
+  };
+
+  const handleCheckOut = async () => {
+    try {
+      const result = await parkingApi.checkOut({
+        sessionId: activeSessionId || undefined,
+        cardId: scannedData?.mssv,
+        visitorCardId: scannedData?.cardId,
+      });
+      setCheckOutTime(result.timeOut || new Date().toLocaleTimeString('vi-VN'));
+      void loadParkingMap();
+    } catch (err) {
+      console.warn('Check-out API unavailable, falling back to local state.', err);
+      setCheckOutTime(new Date().toLocaleTimeString('vi-VN'));
+    }
     setCheckedIn(false);
-    setCheckOutTime(new Date().toLocaleTimeString('vi-VN'));
     setAssignedSlot(null);
+    setActiveSessionId(null);
   };
 
   return (
@@ -137,7 +205,7 @@ export function Parking() {
             <Filter className="w-4 h-4" />
             Lọc
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button onClick={() => void loadParkingMap()} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <RefreshCw className="w-4 h-4" />
             Làm mới
           </button>

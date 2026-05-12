@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { CreditCard, CheckCircle, Calendar, Smartphone, X, LoaderCircle } from "lucide-react";
+import { getStoredRole, getStoredUserId, type ApiRole } from "../../api/client";
+import { paymentApi } from "../../api/paymentApi";
 
 const QR_EXPIRE_SECONDS = 300;
 
 type QrContext = "student" | "lecturer";
 
 export function Payment() {
-  const role = localStorage.getItem("accountRole") || "student";
+  const role = getStoredRole("student") as ApiRole;
 
   const isAdmin = role === "admin";
   const isEmployee = role === "employee";
@@ -21,6 +23,8 @@ export function Payment() {
   const [qrError, setQrError] = useState<string | null>(null);
   const [qrImageUrl, setQrImageUrl] = useState<string | null>(null);
   const [qrToken, setQrToken] = useState<string | null>(null);
+  const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
+  const [paymentConfirmMessage, setPaymentConfirmMessage] = useState<string | null>(null);
   const [countdownSeconds, setCountdownSeconds] = useState(QR_EXPIRE_SECONDS);
   const [activeAmount, setActiveAmount] = useState(0);
 
@@ -33,6 +37,8 @@ export function Payment() {
     setQrError(null);
     setQrImageUrl(null);
     setQrToken(null);
+    setIsConfirmingPayment(false);
+    setPaymentConfirmMessage(null);
     setCountdownSeconds(QR_EXPIRE_SECONDS);
   };
 
@@ -86,44 +92,48 @@ export function Payment() {
     };
   }, [isQrModalOpen]);
 
+  const confirmBkPayPayment = async (token: string) => {
+    setIsConfirmingPayment(true);
+    setPaymentConfirmMessage(null);
+
+    try {
+      await paymentApi.confirm(token);
+      setPaymentConfirmMessage("ÄĂ£ ghi nháº­n thanh toĂ¡n thĂ nh cĂ´ng.");
+    } catch (err) {
+      console.warn("Payment confirm is not available yet.", err);
+      setPaymentConfirmMessage("ChÆ°a thá»ƒ xĂ¡c nháº­n thanh toĂ¡n. Vui lĂ²ng thá»­ láº¡i sau.");
+    } finally {
+      setIsConfirmingPayment(false);
+    }
+  };
+
   const openBkPayQr = async (amount: number, context: QrContext) => {
     setIsQrModalOpen(true);
     setIsCreatingQr(true);
     setQrError(null);
     setQrImageUrl(null);
     setQrToken(null);
+    setPaymentConfirmMessage(null);
     setActiveAmount(amount);
     setCountdownSeconds(QR_EXPIRE_SECONDS);
 
     try {
-      const response = await fetch("/api/payments/bkpay/qr", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const data = await paymentApi.createBkpayQr({
+        amount,
+        role,
+        context: {
+          type: context === "student" ? "STUDENT_SUBSCRIPTION" : "LECTURER_QUOTA_PURCHASE",
+          userId: getStoredUserId(),
+          ...(context === "lecturer" ? { quantity } : {}),
         },
-        body: JSON.stringify({
-          amount,
-          role,
-          context,
-          expiresInSeconds: QR_EXPIRE_SECONDS,
-        }),
+        expiresInSeconds: QR_EXPIRE_SECONDS,
       });
-
-      if (!response.ok) {
-        throw new Error("Lỗi tạo mã QR");
-      }
-
-      const data = (await response.json()) as {
-        qrImageUrl?: string;
-        qrCodeBase64?: string;
-        qrToken?: string;
-        expiresInSeconds?: number;
-      };
-
       const resolvedQrImage = data.qrImageUrl
         ? data.qrImageUrl
         : data.qrCodeBase64
-          ? `data:image/png;base64,${data.qrCodeBase64}`
+          ? data.qrCodeBase64.startsWith("data:")
+            ? data.qrCodeBase64
+            : `data:image/png;base64,${data.qrCodeBase64}`
           : null;
 
       if (!resolvedQrImage) {
@@ -369,6 +379,18 @@ export function Payment() {
                   {qrToken && (
                     <p className="text-xs text-gray-500 break-all text-center">Phien giao dich: {qrToken}</p>
                   )}
+                  {qrToken && (
+                    <button
+                      onClick={() => void confirmBkPayPayment(qrToken)}
+                      disabled={isConfirmingPayment}
+                      className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isConfirmingPayment ? "Äang xĂ¡c nháº­n..." : "TĂ´i Ä‘Ă£ thanh toĂ¡n"}
+                    </button>
+                  )}
+                  {paymentConfirmMessage && (
+                    <p className="text-center text-sm text-gray-600">{paymentConfirmMessage}</p>
+                  )}
                 </div>
               )}
             </div>
@@ -378,3 +400,4 @@ export function Payment() {
     </div>
   );
 }
+

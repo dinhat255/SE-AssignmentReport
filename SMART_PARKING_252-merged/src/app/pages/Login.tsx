@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ArrowLeft, Eye, EyeOff, Users, ParkingSquare, Activity, GraduationCap, ShieldCheck, UserCircle } from 'lucide-react';
 import logoImage from "/src/assets/01_logobachkhoa.png";
+import { authApi } from '../api/authApi';
+import { saveAuthSession } from '../api/client';
 
 type AccountType = 'hcmut' | 'admin' | 'employee';
 
@@ -13,9 +15,7 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const fallbackLogin = () => {
     // Demo credentials validation
     const validCredentials = {
       hcmut: { email: 'student@hcmut.edu.vn', password: 'student123' },
@@ -30,11 +30,29 @@ export function Login() {
       if (email === validCredentials.hcmut.email && password === validCredentials.hcmut.password) {
         localStorage.setItem('userType', accountType);
         localStorage.setItem('accountRole', 'student');
+        saveAuthSession('mock-token', {
+          id: 'u-student-001',
+          fullName: 'Minh Lê',
+          email,
+          role: 'student',
+          cardId: 'STU-CARD-001',
+          vehiclePlate: '59A-123.45',
+          userType: 'hcmut',
+        });
         localStorage.setItem('userName', 'Minh Lê');
         navigate('/dashboard');
       } else if (email === validCredentials.lecturer.email && password === validCredentials.lecturer.password) {
         localStorage.setItem('userType', accountType);
         localStorage.setItem('accountRole', 'lecturer');
+        saveAuthSession('mock-token', {
+          id: 'u-lecturer-001',
+          fullName: 'Dr. Trần Văn An',
+          email,
+          role: 'lecturer',
+          cardId: 'LEC-CARD-001',
+          vehiclePlate: '59A-567.89',
+          userType: 'hcmut',
+        });
         localStorage.setItem('userName', 'Dr. Trần Văn An');
         navigate('/dashboard');
       } else {
@@ -43,12 +61,36 @@ export function Login() {
     } else if (email === validCredentials[accountType].email && password === validCredentials[accountType].password) {
       localStorage.setItem('userType', accountType);
       localStorage.setItem('accountRole', accountType);
+      saveAuthSession('mock-token', {
+        id: accountType === 'admin' ? 'u-admin-001' : 'u-employee-001',
+        fullName: accountType === 'admin' ? 'Nguyễn Văn Quản' : 'Lê Thị Mai',
+        email,
+        role: accountType,
+        userType: accountType,
+      });
       localStorage.setItem('userName', 
         accountType === 'admin' ? 'Nguyễn Văn Quản' : 'Lê Thị Mai'
       );
       navigate('/dashboard');
     } else {
       alert('Sai email hoặc mật khẩu! Vui lòng kiểm tra lại thông tin demo bên dưới.');
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const result = await authApi.login({
+        email,
+        password,
+        provider: accountType === 'hcmut' ? 'HCMUT_SSO' : 'LOCAL',
+      });
+      saveAuthSession(result.accessToken, result.user);
+      navigate('/dashboard');
+    } catch (err) {
+      console.warn('Auth API unavailable, falling back to demo login.', err);
+      fallbackLogin();
     }
   };
 

@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { Calendar, ArrowDownToLine, ArrowUpFromLine, AlertTriangle } from 'lucide-react';
 import { getLoginFrequency, getEntryHistory } from '../../../mocks/mockData';
+import { getStoredRole, getStoredUserId } from '../../api/client';
+import { lecturerApi } from '../../api/lecturerApi';
 
 export function LoginFrequency() {
-  const accountRole = localStorage.getItem('accountRole') || 'student';
+  const accountRole = getStoredRole('student');
   const isLecturer = accountRole === 'lecturer';
 
   const [loginFrequency, setLoginFrequency] = useState<{ month: string; count: number }[]>([]);
@@ -19,8 +21,17 @@ export function LoginFrequency() {
     (async () => {
       try {
         setLoading(true);
-        const freq = await getLoginFrequency({ period: 'monthly', role: accountRole });
-        const entries = await getEntryHistory({ role: accountRole });
+        let freq: { month: string; count: number }[];
+        let entries: any[];
+
+        try {
+          freq = await lecturerApi.getFrequency(getStoredUserId());
+          entries = await lecturerApi.getEntryHistory(getStoredUserId());
+        } catch (err) {
+          console.warn('Lecturer API unavailable, falling back to mock frequency.', err);
+          freq = await getLoginFrequency({ period: 'monthly', role: accountRole });
+          entries = await getEntryHistory({ role: accountRole }) as any[];
+        }
         if (!mounted) return;
         setLoginFrequency(freq);
         setEntryHistory(entries as any[]);
