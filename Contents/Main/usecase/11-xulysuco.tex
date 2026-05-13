@@ -1,7 +1,7 @@
 \begin{center}
     \begin{tabular}{|m{2.5cm}|m{13cm}|}
     \hline
-        ID Use-case  & UC010 \\ 
+        ID Use-case  & UC011 \\ 
         Name Use-case & Xử lý sự cố tại chỗ \\ 
     \hline
         Actors & Nhân viên, quản trị viên \\
@@ -30,7 +30,20 @@
         
         5. Hệ thống ghi nhận báo cáo vào cơ sở dữ liệu, hiển thị “Gửi yêu cầu thành công”. \\
     \hline
-        Alternative flow & - \\ 
+        Alternative flow & 
+        \textbf{Alt 1: Đính kèm hình ảnh minh chứng}
+        
+        3a. Tại bước 3, nhân viên nhấn chọn chức năng "Đính kèm hình ảnh".
+        
+        3b. Nhân viên tải lên ảnh chụp hiện trường (ví dụ: ảnh xe ngã đổ, thiết bị hỏng).
+        
+        3c. Hệ thống hiển thị ảnh đã tải và tiếp tục cho phép nhập mô tả (quay lại Bước 4).
+        
+        \textbf{Alt 2: Hủy báo cáo sự cố}
+        
+        4a. Trước khi nhấn nút gửi, nhân viên chọn "Hủy bỏ" hoặc biểu tượng đóng hộp thoại.
+        
+        4b. Hệ thống xác nhận việc hủy, xóa các thông tin đang nhập dở và quay trở về màn hình trước đó. \\ 
     \hline
         Exception flow & 
         - Tại bước 5, nếu gửi không thành công, hệ thống sẽ hiện thị thông báo “Gửi yêu cầu thất bại, vui lòng thử lại sau” và giữ nguyên thông tin điền của nhân viên. \\ 

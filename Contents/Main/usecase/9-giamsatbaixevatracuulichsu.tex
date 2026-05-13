@@ -1,0 +1,52 @@
+\begin{center}
+    \begin{tabular}{|m{2.5cm}|m{13cm}|}
+    \hline
+        ID Use-case  & UC9 \\ 
+        Name Use-case & Giám sát bãi xe và tra cứu lịch sử \\ 
+    \hline
+        Actors & Quản trị viên \\
+    \hline
+        Description & Giúp quản trị viên theo dõi trạng thái bãi xe hiện tại (số chỗ trống), xem lịch sử các giao dịch, lịch sử ra/vào và tra cứu chi tiết thông tin của người dùng. [cite: 128] \\
+    \hline
+        Trigger & Quản trị viên chọn phần Giám sát dữ liệu trên giao diện quản trị riêng. [cite: 128] \\
+    \hline
+        Preconditions & 
+        1. Quản trị viên đăng nhập thành công vào trang quản lý hệ thống. [cite: 128]
+        
+        2. Hệ thống đang hoạt động ổn định. [cite: 128] \\
+    \hline
+        Post conditions & Quản trị viên lấy được thông tin cần tra cứu. Hệ thống không thay đổi trạng thái dữ liệu. [cite: 128] \\
+    \hline
+        Normal flow & 
+        1. Quản trị viên truy cập phần Giám hệ thống trên màn hình. [cite: 128]
+        
+        2. Hệ thống truy xuất dữ liệu từ cơ sở dữ liệu nội bộ và hiển thị bảng tổng quan: số lượng chỗ còn trống, lịch sử thanh toán và lịch sử ra/vào gần nhất. [cite: 128]
+        
+        3. Quản trị viên tìm chi tiết thông qua nhập thông tin của người dùng nội bộ (MSSV, MSCB), hoặc thông tin thẻ tạm dành cho khách vãng lai và bấm tìm kiếm. [cite: 128]
+        
+        4. Hệ thống lọc theo thông tin chi tiết và trả về các lịch sử thanh toán, ra vào khớp với thông tin quản trị viên nhập. [cite: 128]
+        
+        5. Quản trị viên có thể nhấp vào 1 giao dịch cụ thể để xem chi tiết. [cite: 128]
+        
+        6. Quản trị viên thoát khỏi màn hình hoặc tiếp tục tra cứu. [cite: 128] \\
+    \hline
+        Alternative flow & 
+        \textbf{Alt 1: Tra cứu theo khoảng thời gian}
+        
+        3a. Tại màn hình giám sát, Quản trị viên chọn bộ lọc theo ngày/giờ (Từ ngày... Đến ngày...).
+        
+        4a. Hệ thống truy xuất và hiển thị danh sách tất cả lượt ra vào/thanh toán trong khoảng thời gian đã chọn.
+        
+        \textbf{Alt 2: Xuất báo cáo dữ liệu}
+        
+        5a. Quản trị viên nhấn nút "Xuất báo cáo" (Excel/PDF) cho danh sách đang hiển thị.
+        
+        6a. Hệ thống khởi tạo file và tải về máy tính của Quản trị viên. \\ 
+    \hline
+        Exception flow & 
+        - Tại bước 4, nếu không tìm thấy thông tin: hệ thống trả về thông báo “Không tìm thấy thông tin khớp với dữ liệu nhập”. [cite: 128]
+        
+        - Tại bước 2 hoặc 4, nếu mất kết nối với database: hệ thống hiển thị thông báo pop-up “Lỗi truy xuất dữ liệu, vui lòng thử lại sau”. [cite: 128] \\
+    \hline
+    \end{tabular}
+\end{center}
