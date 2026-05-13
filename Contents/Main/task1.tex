@@ -305,8 +305,9 @@ Các hệ thống tích hợp để hỗ trợ hoạt động của hệ thống
         \xrowht{30pt}   UC007   & Cấu hình chính sách giá và quyền lợi gửi xe      & Quản trị viên thiết lập hoặc điều chỉnh chính sách giá và quyền lợi gửi xe cho từng nhóm người dùng. \\ \hline
 
           \xrowht{30pt}   UC008   & Thống kê và xuất báo cáo & Quản trị viên hoặc nhân viên xem và xuất báo cáo thống kê về lượt gửi xe, doanh thu và tình trạng bãi xe. \\  \hline 
-         \xrowht{30pt}   UC009   & Giám sát và đồng bộ dữ liệu & Hệ thống giám sát trạng thái các cảm biến, gateway và đồng bộ dữ liệu với HCMUT DATACORE để đảm bảo tính nhất quán. \\  \hline
-         \xrowht{30pt}   UC010   & Xử lý sự cố tại chỗ & Nhân viên tiếp nhận phản ánh sự cố từ người dùng (ví dụ: mất thẻ, lỗi cổng, lỗi thanh toán), ghi nhận sự cố vào hệ thống và gửi thông báo đến quản trị viên để kiểm tra và xử lý. \\  \hline
+         \xrowht{30pt}   UC009   & Giám sát bãi xe và tra cứu lịch sử & Hệ thống giám sát trạng thái các cảm biến, gateway để giám sát tình hình bãi xe và cho phép tra cứu lịch sử hoạt động của bãi xe. \\  \hline
+         \xrowht{30pt}   UC010   & Đồng bộ dữ liệu hệ thống & Hệ thống tự động cập nhật thông tin người dùng và trạng thái tài chính từ hệ thống trường (SSO, DataCore, BKPay) ngay khi có xe ra/vào bãi. \\ \hline
+         \xrowht{30pt}   UC011   & Xử lý sự cố tại chỗ & Nhân viên tiếp nhận phản ánh sự cố từ người dùng (ví dụ: mất thẻ, lỗi cổng, lỗi thanh toán), ghi nhận sự cố vào hệ thống và gửi thông báo đến quản trị viên để kiểm tra và xử lý. \\  \hline
     \end{tabular}
 \end{center}
 
@@ -372,10 +373,20 @@ Các hệ thống tích hợp để hỗ trợ hoạt động của hệ thống
 % \newpage
 
 
-\ssssection{Bảng mô tả usecase Giám sát và đồng bộ dữ liệu}
+\ssssection{Bảng mô tả usecase Giám sát bãi xe và tra cứu lịch sử}
 
-\input{Contents/Main/usecase/9-giamsatvadongbo}
+\input{Contents/Main/usecase/9-giamsatbaixevatracuulichsu}
+
+% \newpage
+
+
+\ssssection{Bảng mô tả usecase Đồng bộ dữ liệu hệ thống}
+
+\input{Contents/Main/usecase/10-dongbodulieuhethong}
+
+\newpage
+
 
 \ssssection{Bảng mô tả usecase Xử lý sự cố tại chỗ}
 
-\input{Contents/Main/usecase/10-xulysuco}
+\input{Contents/Main/usecase/11-xulysuco}

@@ -1,0 +1,43 @@
+\begin{center}
+    \begin{tabular}{|m{2.5cm}|m{13cm}|}
+    \hline
+        ID Use-case  & UC10 \\ 
+        Name Use-case & Đồng bộ dữ liệu hệ thống \\ 
+    \hline
+        Actors & Hệ thống (System), Quản trị viên, HCMUT-DATACORE, BKPay. [cite: 130] \\
+    \hline
+        Description & Tự động cập nhật thông tin người dùng và trạng thái tài chính từ hệ thống trường (SSO, DataCore, BKPay) ngay khi có xe ra/vào bãi. [cite: 130] \\
+    \hline
+        Trigger & Hệ thống nhận được tín hiệu quẹt thẻ từ đầu đọc thẻ tại cổng Check-in hoặc Check-out. [cite: 130] \\
+    \hline
+        Preconditions & Hệ thống ở trạng thái sẵn sàng gọi API. [cite: 130] \\
+    \hline
+        Post conditions & Dữ liệu tại chỗ được đồng bộ với máy chủ trường ngay lập tức. [cite: 130] \\
+    \hline
+        Normal flow & 
+        1. Đầu đọc thẻ gửi mã định danh thẻ về bộ điều khiển trung tâm. [cite: 130]
+        
+        2. Hệ thống nhận diện sự kiện và tự động gọi API tới HCMUT-DATACORE để kiểm tra tính hợp lệ của thẻ và thông tin chủ thẻ. [cite: 130]
+        
+        3. Hệ thống đồng thời gọi API tới BKPay để truy vấn số dư hoặc xác nhận trạng thái thanh toán (đối với xe ra). [cite: 130]
+        
+        4. Các hệ thống ngoại phản hồi dữ liệu mới nhất về cho bộ điều khiển trung tâm. [cite: 130]
+        
+        5. Hệ thống đối chiếu và cập nhật dữ liệu này vào Cơ sở dữ liệu nội bộ (Local DB) để phục vụ việc ra quyết định mở barie. [cite: 130]
+        
+        6. Hệ thống ghi nhận sự kiện đồng bộ vào nhật ký (Log). [cite: 130] \\
+    \hline
+        Alternative flow & 
+        \textbf{Alt 1: Đồng bộ thủ công từ Admin}
+        
+        1a. Quản trị viên truy cập màn hình cấu hình hệ thống và nhấn nút "Đồng bộ toàn bộ dữ liệu".
+        
+        2a. Hệ thống gửi yêu cầu tải lại toàn bộ danh sách người dùng và giao dịch từ DataCore và BKPay.
+        
+        3a. Hệ thống cập nhật lại toàn bộ Cơ sở dữ liệu nội bộ và thông báo kết quả cho Quản trị viên. \\ 
+    \hline
+        Exception flow & 
+        Tại bước 4, nếu API không phản hồi: Hệ thống sử dụng dữ liệu cũ nhất được lưu trong Local DB (Offline mode) để xử lý và đánh dấu "Cần đồng bộ lại sau". [cite: 130] \\
+    \hline
+    \end{tabular}
+\end{center}
