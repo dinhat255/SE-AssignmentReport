@@ -525,32 +525,45 @@ paths:
         "200":
           description: Success
   /api/employee/incidents:
-    post:
-      tags: [Employee]
-      summary: New incident report
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                spotId: { type: string }
-                title: { type: string }
-                description: { type: string }
-                type: { type: string }
-                severity: { type: string }
-                attachments: { type: array, items: { type: string } }
-            example:
-              spotId: "A10"
-              title: "Sensor Disconnected"
-              description: "Sensor reported incorrect status, stays red when empty."
-              type: "HARDWARE"
-              severity: "HIGH"
-              attachments: []
+    get:
+      tags:
+        - Employee
+      summary: "Handle maintenance issues"
+      parameters:
+        - name: statuss
+          in: query
+          schema:
+            type: string
+          description: "Lọc theo trạng thái (Ví dụ: Chưa xử lý, Đang xử lý, Đã xử lý)"
+        - name: spotId
+          in: query
+          schema:
+            type: string
+          description: "Lọc theo vị trí (Ví dụ: A01)"
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
       responses:
-        "201":
-          description: Incident report received
-
+        "200":
+          description: "Thành công"
+          content:
+            application/json:
+              example:
+                incidents:
+                  - id: "M001"
+                    spotId: "A01"
+                    title: "Sensor lỗi khu A"
+                    status: "Chưa xử lý"
+                    severity: "Cảnh báo"
+                    reportedAt: "2026-05-14 10:30"
+                total: 5
   /api/maintenance/issues/{id}:
     patch:
       tags: [Maintenance]

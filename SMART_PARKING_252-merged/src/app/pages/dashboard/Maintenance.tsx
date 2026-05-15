@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { AlertTriangle, CheckCircle2, Clock, MapPin, Filter, Search, Plus, X, Upload, FileText } from 'lucide-react';
-import { getMaintenanceIssues, postMaintenanceReport } from '../../../mocks/mockData';
+import { employeeApi } from '../../api/employeeApi';
 
 interface MaintenanceIssue {
   id: string;
@@ -34,8 +34,6 @@ export function Maintenance() {
   const [errorMessage, setErrorMessage] = useState('');
 
   // Form state
-  // Backend contract:
-  // this form should POST to /api/maintenance/report and upload attachments separately.
   const [reportForm, setReportForm] = useState({
     incidentCategory: '',
     incidentType: '',
@@ -46,31 +44,49 @@ export function Maintenance() {
     attachments: [] as File[]
   });
 
-  // Backend contract:
-  // replace with GET /api/maintenance/issues and keep the same MaintenanceIssue shape.
   const [issues, setIssues] = useState<MaintenanceIssue[]>([]);
   const [loadingIssues, setLoadingIssues] = useState(true);
   const [errorIssues, setErrorIssues] = useState<string | null>(null);
+  
+  const fetchData = useCallback(async () => {
+  try {
+    setLoadingIssues(true);
+    const response = await employeeApi.getIncidents();
+    
+    const convertedIssues = response.incidents.map((incident: any) => ({
+      id: incident.id,
+      zone: incident.spotId?.charAt(0) || 'N/A',
+      spot: incident.spotId || 'N/A',
+      sensor: incident.sensorId || 'N/A',
+      issueType: incident.title || 'Sự cố thiết bị',
+      severity: 
+        incident.severity === 'HIGH' ? 'critical' : 
+        incident.severity === 'MEDIUM' ? 'warning' : 'info',
+      status: 
+        (incident.status === 'Chưa xử lý' || incident.status === 'OPEN') ? 'pending' : 
+        (incident.status === 'Đang xử lý' || incident.status === 'IN_PROGRESS') ? 'in-progress' : 'resolved',
+      reportedAt: incident.reportedAt,
+      description: incident.description,
+      reportedBy: incident.reportedBy,
+      resolvedAt: incident.resolvedAt,
+      attachments: incident.attachments || [],
+    }));
 
+    setIssues(convertedIssues);
+    setErrorIssues(null);
+  } catch (err) {
+    setErrorIssues('Không tải được danh sách sự cố.');
+    console.error('Error fetching incidents:', err);
+  } finally {
+    setLoadingIssues(false);
+  }
+}, []); // Dùng useCallback để hàm không bị khởi tạo lại vô ích
+  // Fetch incidents from API
   useEffect(() => {
-    if (!hasAccess) return;
-
-    let mounted = true;
-    (async () => {
-      try {
-        setLoadingIssues(true);
-        const data = await getMaintenanceIssues();
-        if (!mounted) return;
-        setIssues(data);
-      } catch (err) {
-        if (!mounted) return;
-        setErrorIssues('Không tải được danh sách sự cố.');
-      } finally {
-        if (mounted) setLoadingIssues(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+    if (hasAccess) {
+      fetchData();
+    }
+  }, [hasAccess, fetchData]);
 
   if (!hasAccess) {
     return (
@@ -153,18 +169,23 @@ export function Maintenance() {
     }
   };
 
-  const handleStatusChange = (issueId: string, newStatus: 'pending' | 'in-progress' | 'resolved') => {
-    setIssues(issues.map(issue => {
-      if (issue.id === issueId) {
-        return {
-          ...issue,
-          status: newStatus,
-          resolvedAt: newStatus === 'resolved' ? new Date().toISOString().slice(0, 16).replace('T', ' ') : undefined,
-          resolvedBy: newStatus === 'resolved' ? currentUser : undefined
-        };
-      }
-      return issue;
-    }));
+  const handleStatusChange = async (issueId: string, newStatus: 'pending' | 'in-progress' | 'resolved') => {
+    try {
+      // 1. Chuyển đổi format trạng thái phù hợp với Backend
+      const apiStatus = newStatus === 'resolved' ? 'Đã xử lý' : 
+                        newStatus === 'in-progress' ? 'Đang xử lý' : 'Chưa xử lý';
+
+      // 2. Gọi API cập nhật
+      await employeeApi.updateIncidentStatus(issueId, apiStatus);
+      // 3. Gọi hàm fetchData để đồng bộ lại toàn bộ danh sách từ server
+      await fetchData(); 
+      
+    } catch (err) {
+      console.error('Lỗi khi cập nhật trạng thái:', err);
+      setErrorMessage('Không thể cập nhật trạng thái. Vui lòng thử lại.');
+      setShowErrorNotification(true);
+      setTimeout(() => setShowErrorNotification(false), 3000);
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -187,25 +208,21 @@ export function Maintenance() {
   };
 
   const validateForm = () => {
-    // Kiểm tra loại sự cố
     if (!reportForm.incidentCategory) {
       setErrorMessage('Vui lòng chọn loại sự cố');
       return false;
     }
 
-    // Nếu sự cố tại chỗ hoặc sự cố thiết bị, kiểm tra chi tiết sự cố
     if ((reportForm.incidentCategory === 'on-site' || reportForm.incidentCategory === 'equipment') && !reportForm.incidentType) {
       setErrorMessage('Vui lòng chọn chi tiết sự cố');
       return false;
     }
 
-    // Kiểm tra zone và spot - chỉ bắt buộc cho sự cố thiết bị và sự cố khác
     if ((reportForm.incidentCategory === 'equipment' || reportForm.incidentCategory === 'other') && (!reportForm.zone || !reportForm.spotNumber)) {
       setErrorMessage('Vui lòng chọn khu vực và vị trí');
       return false;
     }
 
-    // Kiểm tra mô tả
     if (!reportForm.description || reportForm.description.trim().length < 10) {
       setErrorMessage('Vui lòng nhập mô tả chi tiết (ít nhất 10 ký tự)');
       return false;
@@ -214,59 +231,54 @@ export function Maintenance() {
     return true;
   };
 
-  const handleSubmitReport = () => {
-    // Validate form
+ const handleSubmitReport = async () => {
+    // Validate form trước khi gửi
     if (!validateForm()) {
       setShowErrorNotification(true);
       setTimeout(() => setShowErrorNotification(false), 3000);
       return;
     }
 
-    // Tạo ID mới cho báo cáo
-    const newId = `M${String(issues.length + 1).padStart(3, '0')}`;
+    try {
+      // 1. Chuẩn bị dữ liệu (Payload) theo đúng cấu trúc Backend/Swagger
+      const payload = {
+        spotId: reportForm.zone && reportForm.spotNumber 
+          ? `${reportForm.zone}${reportForm.spotNumber.padStart(2, '0')}` 
+          : 'N/A',
+        title: reportForm.incidentType || 'Sự cố mới',
+        description: reportForm.description,
+        type: reportForm.incidentCategory,
+        severity: reportForm.severity === 'critical' ? 'HIGH' : 
+                  reportForm.severity === 'warning' ? 'MEDIUM' : 'LOW',
+        reportedBy: currentUser,
+      };
 
-    // Tạo spot ID và sensor ID (chỉ khi có zone và spotNumber)
-    const spotId = reportForm.zone && reportForm.spotNumber
-      ? `${reportForm.zone}${reportForm.spotNumber.padStart(2, '0')}`
-      : 'N/A';
+      // 2. Gọi API tạo mới (Có await nên phải có async ở đầu hàm)
+      await employeeApi.createIncident(payload);
 
-    const sensorId = reportForm.zone && reportForm.spotNumber
-      ? `SENSOR-${spotId}-${String(Math.floor(Math.random() * 900) + 100).padStart(3, '0')}`
-      : 'N/A';
+      // 3. Reset form về trạng thái ban đầu
+      setReportForm({
+        incidentCategory: '',
+        incidentType: '',
+        zone: '',
+        spotNumber: '',
+        description: '',
+        severity: 'warning',
+        attachments: []
+      });
 
-    // Tạo issue mới
-    const newIssue: MaintenanceIssue = {
-      id: newId,
-      zone: reportForm.zone || 'N/A',
-      spot: spotId,
-      sensor: sensorId,
-      issueType: reportForm.incidentCategory === 'other' ? 'Sự cố khác' : reportForm.incidentType,
-      severity: reportForm.severity,
-      status: 'pending',
-      reportedAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
-      description: reportForm.description,
-      reportedBy: currentUser,
-      attachments: reportForm.attachments.map(f => f.name)
-    };
-
-    // Thêm vào danh sách (thêm vào đầu để hiển thị mới nhất)
-    setIssues([newIssue, ...issues]);
-
-    // Reset form
-    setReportForm({
-      incidentCategory: '',
-      incidentType: '',
-      zone: '',
-      spotNumber: '',
-      description: '',
-      severity: 'warning',
-      attachments: []
-    });
-
-    // Đóng modal và hiển thị thông báo thành công
-    setShowReportModal(false);
-    setShowSuccessNotification(true);
-    setTimeout(() => setShowSuccessNotification(false), 3000);
+      // 4. Đóng Modal và tải lại dữ liệu mới nhất
+      setShowReportModal(false);
+      await fetchData(); 
+      
+      setShowSuccessNotification(true);
+      setTimeout(() => setShowSuccessNotification(false), 3000);
+    } catch (error) {
+      setErrorMessage('Không thể gửi báo cáo. Vui lòng kiểm tra lại Backend.');
+      setShowErrorNotification(true);
+      setTimeout(() => setShowErrorNotification(false), 3000);
+      console.error('Error creating incident:', error);
+    }
   };
 
   const filteredIssues = issues.filter(issue => {
@@ -647,7 +659,19 @@ export function Maintenance() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredIssues.length === 0 ? (
+              {loadingIssues ? (
+                <tr>
+                  <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
+                    Đang tải dữ liệu...
+                  </td>
+                </tr>
+              ) : errorIssues ? (
+                <tr>
+                  <td colSpan={9} className="px-6 py-8 text-center text-red-500">
+                    {errorIssues}
+                  </td>
+                </tr>
+              ) : filteredIssues.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
                     Không tìm thấy lỗi nào

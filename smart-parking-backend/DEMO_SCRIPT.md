@@ -123,7 +123,7 @@ Expected:
 - Spot released.
 ## 4. Admin flow
 1. Logout or clear session if needed.
-2. Login with HCMUT_SSO(lecture/student).
+2. Login with HCMUT_SSO(lecture/student/employee).
 3. Open Dashboard.
 4. Open Pariking(tình trạng) .
 5. Check in/out
@@ -132,24 +132,40 @@ Expected:
 8. /api/admin/users
 9. Display all users in system
 ## 5. Employee flow
-1. Logout or clear session if needed.
-2. Login with employee@hcmut.edu.vn / employee123
-3. Open Bảo trì (Maintenance) page.
-Expected:
-- Existing maintenance issues load from backend.
-4. Execute POST /api/employee/incidents on Swagger with a new incident.
-Expected:
-- New incident appears on the UI table with correct ID (e.g., M003).
-- Severity status matches the input (e.g., "Nghiêm trọng" for HIGH).
-5. Open Tình trạng (Parking Map/Status).
-6. Perform POST /api/employee/manual-checkin via UI or Swagger for a vehicle.
-Expected:
-- Parking spot status changes to OCCUPIED.
-- A new parking session is created in the system.
-7. Perform POST /api/employee/manual-checkout.
-Expected:
-- Parking spot returns to AVAILABLE.
-- Payment/Session status is updated to COMPLETED.
+1. Login:
+ - Access the system with the employee account: 
+     employee@hcmut.edu.vn / employee123.
+2. Initial Data Verification:
+- Navigate to the Maintenance page.
+- Execute the GET /api/employee/incidents endpoint.
+
+Expected: 
+- The incident list on the UI matches the Swagger response exactly (e.g., displaying existing records like M001, M002,...).
+
+3. Report a New Incident:
+- Action: 
+    Click the "Report New Incident" button on the UI. Fill in the required details (Spot ID, Incident Type, Description) and click "Submit".
+- Expected on UI:
+     A success notification appears, and the new incident (e.g., M006) is immediately added to the table.
+
+4. Verify New Incident :
+- Action: 
+    Return to execute the GET /api/employee/incidents endpoint again.
+- Expected: 
+    The newly created incident (M006) now appears in the Backend JSON response, proving the UI successfully sent the data.
+
+5. Resolve an Incident & Update Status:
+
+- Action:  
+    On the UI,  click the "Xử lý/Hoàn tất" button.
+- Expected : 
+    The incident status changes to "Đã xử lý" (or In-progress).
+
+6. Final Synchronization Check:
+- Action: 
+    Execute the GET /api/employee/incidents endpoint on Swagger one last time.
+- Expected:
+    The status field for that specific incident has been updated to "Đã xử lý" in the database.
 ## 6. Visitor flow
 1. A visitor vehicle arrives at the parking entrance.
 2. Perform POST /api/visitor/check-in via Swagger or the entrance kiosk.
@@ -208,6 +224,6 @@ Expected:
 | UC 003 Guest card scan | `POST /api/visitor/check-in` , `POST /api/visitor/check-in` |
 | UC 004 On-site payment  | `POST /api/visitor/payment` |
 | UC 009 Monitoring and data synchronization |   `GET /api/admin/users` + `GET /api/admin/audit-logs` |
-| UC 010 Fixed on-site treatment |  `POST /api/employee/incidents` , `PATCH /api/maintenance/issues`{id}| 
+| UC 010 Fixed on-site treatment |  `GET /api/employee/incidents` , `PATCH /api/maintenance/issues`{id}| 
 | UC 007 Pricing policy | `POST /api/admin/policy/pricing` , `GET /api/admin/policy/pricing` |
 For MVP, external systems are mocked but the flow follows the submitted sequence and activity diagrams.
