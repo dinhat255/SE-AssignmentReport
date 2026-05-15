@@ -98,10 +98,10 @@ export function Payment() {
 
     try {
       await paymentApi.confirm(token);
-      setPaymentConfirmMessage("ÄĂ£ ghi nháº­n thanh toĂ¡n thĂ nh cĂ´ng.");
+      setPaymentConfirmMessage("Đã ghi nhận thanh toán thành công.");
     } catch (err) {
       console.warn("Payment confirm is not available yet.", err);
-      setPaymentConfirmMessage("ChÆ°a thá»ƒ xĂ¡c nháº­n thanh toĂ¡n. Vui lĂ²ng thá»­ láº¡i sau.");
+      setPaymentConfirmMessage("Chưa thể xác nhận thanh toán. Vui lòng thử lại sau.");
     } finally {
       setIsConfirmingPayment(false);
     }
@@ -385,7 +385,7 @@ export function Payment() {
                       disabled={isConfirmingPayment}
                       className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {isConfirmingPayment ? "Äang xĂ¡c nháº­n..." : "TĂ´i Ä‘Ă£ thanh toĂ¡n"}
+                      {isConfirmingPayment ? "Đang xác nhận..." : "Tôi đã thanh toán"}
                     </button>
                   )}
                   {paymentConfirmMessage && (

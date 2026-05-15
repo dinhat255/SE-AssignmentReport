@@ -14,7 +14,7 @@ export function Sidebar() {
     { icon: ParkingSquare, label: 'Tình trạng', path: '/dashboard/parking', allowedRoles: ['student', 'lecturer', 'admin', 'employee'] },
     { icon: Clock, label: 'Lịch sử', path: '/dashboard/history', allowedRoles: ['student', 'lecturer', 'admin', 'employee'] },
     { icon: CreditCard, label: 'Thanh toán', path: '/dashboard/payment', allowedRoles: ['student', 'lecturer'] },
-    { icon: Users, label: 'Tần suất', path: '/dashboard/frequency', allowedRoles: ['lecturer'] },
+    { icon: Users, label: 'Tần suất', path: '/dashboard/frequency', allowedRoles: ['student', 'lecturer'] },
     { icon: Wrench, label: 'Bảo trì', path: '/dashboard/maintenance', allowedRoles: ['admin', 'employee'] },
     { icon: User, label: 'Hồ sơ', path: '/dashboard/profile', allowedRoles: ['student', 'lecturer', 'admin', 'employee'] },
   ];

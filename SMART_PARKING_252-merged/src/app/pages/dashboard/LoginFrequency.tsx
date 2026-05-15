@@ -8,6 +8,8 @@ import { lecturerApi } from '../../api/lecturerApi';
 export function LoginFrequency() {
   const accountRole = getStoredRole('student');
   const isLecturer = accountRole === 'lecturer';
+  const isStudent = accountRole === 'student';
+  const allowed = isLecturer || isStudent;
 
   const [loginFrequency, setLoginFrequency] = useState<{ month: string; count: number }[]>([]);
   const [entryHistory, setEntryHistory] = useState<any[]>([]);
@@ -15,31 +17,49 @@ export function LoginFrequency() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isLecturer) return;
-
+    // Render yearly view with months as columns, mock for Tháng 1..4
     let mounted = true;
     (async () => {
       try {
         setLoading(true);
-        let freq: { month: string; count: number }[];
-        let entries: any[];
 
+        // Build 12 months: 1..4 = mock, 5 = current/stored count, 6..12 = 0
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1; // 1-12
+        const currentYear = now.getFullYear();
+
+        const months: { month: string; count: number }[] = Array.from({ length: 12 }).map((_, i) => ({ month: `Tháng ${i + 1}`, count: 0 }));
+
+        // mock for months 1..4
+        months[0].count = 1;
+        months[1].count = 2;
+        months[2].count = 3;
+        months[3].count = 4;
+
+        // month 5: use stored login events for this role and current month if available
         try {
-          const storedFrequency = getLoginFrequencyFromStoredLogins('lecturer');
-          freq = storedFrequency.length > 0
-            ? storedFrequency
-            : await lecturerApi.getFrequency(getStoredUserId());
-          entries = await lecturerApi.getEntryHistory(getStoredUserId());
-        } catch (err) {
-          console.warn('Lecturer API unavailable, falling back to mock frequency.', err);
-          const storedFrequency = getLoginFrequencyFromStoredLogins('lecturer');
-          freq = storedFrequency.length > 0
-            ? storedFrequency
-            : await getLoginFrequency({ period: 'monthly', role: accountRole });
-          entries = await getEntryHistory({ role: accountRole }) as any[];
+          const stored = getLoginFrequencyFromStoredLogins(accountRole);
+          const key = `${String(currentMonth).padStart(2, '0')}/${currentYear}`;
+          const found = stored.find((s) => s.month === key);
+          months[4].count = found ? found.count : 0;
+        } catch {
+          months[4].count = 0;
         }
+
+        // Try to fetch recent entry history for the current user/role, fallback to mock
+        let entries: any[] = [];
+        try {
+          if (isLecturer) {
+            entries = await lecturerApi.getEntryHistory(getStoredUserId());
+          } else {
+            entries = await getEntryHistory({ role: accountRole }) as any[];
+          }
+        } catch {
+          entries = [];
+        }
+
         if (!mounted) return;
-        setLoginFrequency(freq);
+        setLoginFrequency(months);
         setEntryHistory(entries as any[]);
       } catch (err) {
         if (!mounted) return;
@@ -49,9 +69,9 @@ export function LoginFrequency() {
       }
     })();
     return () => { mounted = false; };
-  }, [accountRole]);
+  }, [accountRole, isLecturer]);
 
-  if (!isLecturer) {
+  if (!allowed) {
     return (
       <div className="p-6">
         <div className="max-w-2xl rounded-xl border border-yellow-200 bg-yellow-50 p-6">
@@ -60,7 +80,7 @@ export function LoginFrequency() {
             <div>
               <h1 className="text-xl font-semibold text-gray-900">Không có quyền truy cập</h1>
               <p className="mt-2 text-sm text-gray-700">
-                Trang tần suất đăng nhập chỉ dành cho giảng viên.
+                Trang tần suất đăng nhập chỉ dành cho sinh viên hoặc giảng viên.
               </p>
               <Link to="/dashboard" className="mt-4 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
                 Quay về dashboard
@@ -87,7 +107,7 @@ export function LoginFrequency() {
         <div className={isLecturer ? 'lg:col-span-2' : 'lg:col-span-3'}>
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold text-gray-900">Tần suất đăng nhập (theo tháng)</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Tần suất đăng nhập (theo năm)</h2>
               <div className="text-sm text-blue-600 px-4 py-2 border border-blue-600 rounded-lg">
                 Từ lịch sử đăng nhập
               </div>
@@ -108,8 +128,8 @@ export function LoginFrequency() {
           </div>
         </div>
 
-        {/* Right - Access Limit Card (Only for Lecturer) */}
-        {isLecturer && (
+        {/* Right - Access Limit Card (Lecturer or Student) */}
+        {allowed && (
           <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl shadow-sm p-6 border border-purple-200">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Thẻ giới hạn truy cập</h2>
             <p className="text-sm text-gray-600 mb-6">Quản lý giới hạn truy cập hàng tháng của bạn.</p>
@@ -158,8 +178,8 @@ export function LoginFrequency() {
         )}
       </div>
 
-      {/* Entry History (Only for Lecturer) */}
-      {isLecturer && (
+        {/* Entry History (Lecturer or Student) */}
+      {allowed && (
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mt-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Lịch sử ra vào</h2>

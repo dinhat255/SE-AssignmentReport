@@ -353,7 +353,7 @@ export function Parking() {
                       <DollarSign className="w-4 h-4 text-red-600" />
                       <span className="font-semibold text-gray-900">Thanh toán tại chỗ</span>
                     </div>
-                    <div className="text-lg font-bold text-red-600">50,000đ</div>
+                    <div className="text-lg font-bold text-red-600">3,000 VND</div>
                     <div className="text-xs text-gray-600 mt-1">Phí đậu xe tạm thời (khách)</div>
                   </div>
                 )}
