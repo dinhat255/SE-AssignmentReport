@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { Calendar, ArrowDownToLine, ArrowUpFromLine, AlertTriangle } from 'lucide-react';
 import { getLoginFrequency, getEntryHistory } from '../../../mocks/mockData';
-import { getStoredRole, getStoredUserId } from '../../api/client';
+import { getLoginFrequencyFromStoredLogins, getStoredRole, getStoredUserId } from '../../api/client';
 import { lecturerApi } from '../../api/lecturerApi';
 
 export function LoginFrequency() {
@@ -25,11 +25,17 @@ export function LoginFrequency() {
         let entries: any[];
 
         try {
-          freq = await lecturerApi.getFrequency(getStoredUserId());
+          const storedFrequency = getLoginFrequencyFromStoredLogins('lecturer');
+          freq = storedFrequency.length > 0
+            ? storedFrequency
+            : await lecturerApi.getFrequency(getStoredUserId());
           entries = await lecturerApi.getEntryHistory(getStoredUserId());
         } catch (err) {
           console.warn('Lecturer API unavailable, falling back to mock frequency.', err);
-          freq = await getLoginFrequency({ period: 'monthly', role: accountRole });
+          const storedFrequency = getLoginFrequencyFromStoredLogins('lecturer');
+          freq = storedFrequency.length > 0
+            ? storedFrequency
+            : await getLoginFrequency({ period: 'monthly', role: accountRole });
           entries = await getEntryHistory({ role: accountRole }) as any[];
         }
         if (!mounted) return;
@@ -82,9 +88,9 @@ export function LoginFrequency() {
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-semibold text-gray-900">Tần suất đăng nhập (theo tháng)</h2>
-              <button className="text-sm text-blue-600 hover:text-blue-700 px-4 py-2 border border-blue-600 rounded-lg">
-                Tháng này
-              </button>
+              <div className="text-sm text-blue-600 px-4 py-2 border border-blue-600 rounded-lg">
+                Từ lịch sử đăng nhập
+              </div>
             </div>
             
             <div className="flex items-end justify-around gap-4 h-64 border-l-2 border-b-2 border-gray-300 pl-4 pb-2">

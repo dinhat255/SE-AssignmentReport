@@ -5,6 +5,13 @@ import { Footer } from '../components/Footer';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 
 export function Home() {
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -32,13 +39,17 @@ export function Home() {
                 >
                   Bắt đầu
                 </Link>
-                <button className="text-blue-600 px-8 py-3 rounded-md hover:bg-blue-50 transition-colors font-medium flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('features')}
+                  className="text-blue-600 px-8 py-3 rounded-md hover:bg-blue-50 transition-colors font-medium flex items-center gap-2"
+                >
                   Tìm hiểu thêm <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Feature Cards */}
-              <div className="grid grid-cols-3 gap-4 mt-12">
+              <div id="features" className="grid grid-cols-3 gap-4 mt-12 scroll-mt-24">
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <Clock className="w-8 h-8 text-blue-600 mb-3" />
                   <div className="font-semibold text-gray-900 mb-1">Cập nhật thời gian thực</div>
@@ -104,7 +115,7 @@ export function Home() {
       </section>
 
       {/* Why Smart Parking Section */}
-      <section className="py-20 bg-white">
+      <section id="how-it-works" className="py-20 bg-white scroll-mt-24">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">
             Tại sao chọn Đậu Xe Thông Minh?
@@ -141,6 +152,45 @@ export function Home() {
               <p className="text-gray-600">
                 Tích hợp với hệ thống ĐHBK để quản lý an toàn.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-3 gap-6">
+            <div id="pricing" className="bg-white rounded-2xl p-6 shadow-sm scroll-mt-24">
+              <div className="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                <CreditCard className="w-7 h-7 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Giá cả</h3>
+              <p className="text-gray-600 mb-4">
+                Tối ưu cho sinh viên, giảng viên và nhóm vận hành với chi phí rõ ràng theo tháng.
+              </p>
+              <div className="text-blue-600 font-medium">Xem gói chi tiết trong trang thanh toán.</div>
+            </div>
+
+            <div id="about" className="bg-white rounded-2xl p-6 shadow-sm scroll-mt-24">
+              <div className="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                <Clock className="w-7 h-7 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Giới thiệu</h3>
+              <p className="text-gray-600 mb-4">
+                Hệ thống tập trung vào trải nghiệm vào bãi nhanh, theo dõi lịch sử và đồng bộ trạng thái tức thì.
+              </p>
+              <div className="text-blue-600 font-medium">Thiết kế dành cho triển khai nội bộ tại trường.</div>
+            </div>
+
+            <div id="contact" className="bg-white rounded-2xl p-6 shadow-sm scroll-mt-24">
+              <div className="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                <Shield className="w-7 h-7 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Liên hệ</h3>
+              <p className="text-gray-600 mb-4">
+                Kênh hỗ trợ dành cho lỗi đăng nhập, check-in và vấn đề tài khoản demo.
+              </p>
+              <div className="text-blue-600 font-medium">smartparking@hcmut.edu.vn</div>
             </div>
           </div>
         </div>

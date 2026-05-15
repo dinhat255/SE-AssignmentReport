@@ -13,6 +13,10 @@ tags:
   - name: Student
   - name: Lecturer
   - name: Payments
+  - name: Admin
+  - name: Employee
+  - name: Visitor
+  - name: Reports    
 components:
   responses:
     InvalidCredentials:
@@ -385,3 +389,259 @@ paths:
           $ref: "#/components/responses/BusinessError"
         "404":
           $ref: "#/components/responses/BusinessError"
+  /api/admin/users:
+    get:
+      tags: [Admin]
+      summary: Display the user list
+      parameters:
+        - name: role
+          in: query
+          schema: { type: string, enum: [student, lecturer, employee] }
+        - name: search
+          in: query
+          description: Search by name or email
+          schema: { type: string }
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              example: { success: true, data: [{ id: "u-01", fullName: "Nguyen Van A" }] }
+
+  /api/admin/users/{userId}:
+    patch:
+      tags: [Admin]
+      summary: Update user information
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName: { type: string }
+                balance: { type: number }
+            example: { fullName: "Nguyen Van B", balance: 500000 }
+      responses:
+        "200":
+          description: Success
+          /api/admin/parking/analytics:
+    get:
+      tags: [Admin]
+      summary: Get parking analytics and statistics
+      parameters:
+        - name: startDate
+          in: query
+          description: Start date (format: YYYY-MM-DD)
+          schema: { type: string, format: date }
+        - name: endDate
+          in: query
+          description: End date (format: YYYY-MM-DD)
+          schema: { type: string, format: date }
+        - name: zone
+          in: query
+          description: Filter by zone (e.g., Zone A, Zone B)
+          schema: { type: string }
+      responses:
+        "200":
+          description: Return analytics data (occupancy rate, expected revenue...)
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  totalSpots: 500
+                  occupiedSpots: 350
+                  revenue: 15000000
+                  occupancyRate: "70%"
+
+  /api/admin/audit-logs:
+    get:
+      tags: [Admin]
+      summary: View system activity logs (Audit Logs)
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of records to return
+          schema: { type: integer, default: 50 }
+        - name: action
+          in: query
+          description: Filter by action (e.g., LOGIN, UPDATE_USER, DELETE)
+          schema: { type: string }
+        - name: userId
+          in: query
+          description: Filter logs for a specific user
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of system logs
+          content:
+            application/json:
+              example:
+                success: true
+                logs:
+                  - timestamp: "2026-05-13T10:00:00Z"
+                    userId: "admin-01"
+                    action: "UPDATE_POLICY"
+                    details: "Change hourly ticket price for motorcycles"
+  /api/employee/manual-checkin:
+    post:
+      tags: [Employee]
+      summary: manual-checkin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vehiclePlate: { type: string }
+                cardId: { type: string }
+            example: { vehiclePlate: "59A-12345", cardId: "STU-001" }
+      responses:
+        "201":
+          description: Success
+  /api/employee/manual-checkout:
+    post:
+      tags: [Employee]
+      summary: manual-checkout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ticketId: { type: string, description: "ID của vé cần check-out" }
+                reason: { type: string, description: "Lý do cho ra thủ công" }
+            example:
+              ticketId: "TIC-123456"
+              reason: "Guest card damaged, cash collected"
+      responses:
+        "200":
+          description: Success
+  /api/employee/incidents:
+    get:
+      tags:
+        - Employee
+      summary: "Handle maintenance issues"
+      parameters:
+        - name: statuss
+          in: query
+          schema:
+            type: string
+          description: "Lọc theo trạng thái (Ví dụ: Chưa xử lý, Đang xử lý, Đã xử lý)"
+        - name: spotId
+          in: query
+          schema:
+            type: string
+          description: "Lọc theo vị trí (Ví dụ: A01)"
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: "Thành công"
+          content:
+            application/json:
+              example:
+                incidents:
+                  - id: "M001"
+                    spotId: "A01"
+                    title: "Sensor lỗi khu A"
+                    status: "Chưa xử lý"
+                    severity: "Cảnh báo"
+                    reportedAt: "2026-05-14 10:30"
+                total: 5
+  /api/visitor/check-in:
+    post:
+      tags: [Visitor]
+      summary: Visitor checks in
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vehiclePlate: { type: string }
+            example: { vehiclePlate: "51F-9999" }
+      responses:
+        "201":
+          description: Returns ticket information (ticketId)
+
+  /api/visitor/check-out:
+    post:
+      tags: [Visitor]
+      summary: Visitor requests to leave (calculate fee)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ticketId: { type: string }
+            example: { ticketId: "VIS-123456" }
+      responses:
+        "200":
+          description: Returns the amount due
+          content:
+            application/json:
+              example: { success: true, data: { fee: 10000, stayDuration: "2h" } }
+
+  /api/visitor/payment:
+    post:
+      tags: [Visitor]
+      summary: Pay parking fee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ticketId: { type: string }
+                amount: { type: number }
+            example: { ticketId: "VIS-123456", amount: 10000 }
+      responses:
+        "200":
+          description: Payment successful, gate opened
+  /api/reports/{type}/export:
+    get:
+      tags: [Reports]
+      summary: Export report file (Excel/PDF)
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema: { type: string, enum: [revenue, occupancy, user-activity] }
+        - name: format
+          in: query
+          schema: { type: string, enum: [pdf, excel], default: excel }
+        - name: startDate
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: Returns the download file
+  /api/admin/policy/pricing:
+    get:
+      tags: [Admin]
+      summary: policy/pricing
+      responses:
+        "200":
+          description: OK
+    post:
+      tags: [Admin]
+      summary: Update pricing policy
+      responses:
+        "200":
+          description: OK

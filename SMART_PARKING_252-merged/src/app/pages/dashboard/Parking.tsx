@@ -201,10 +201,6 @@ export function Parking() {
 
         {/* Actions */}
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
-            <Filter className="w-4 h-4" />
-            Lọc
-          </button>
           <button onClick={() => void loadParkingMap()} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <RefreshCw className="w-4 h-4" />
             Làm mới
@@ -271,7 +267,7 @@ export function Parking() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-900">Kết quả quét / Thao tác</h3>
               <div className="flex gap-2">
-                <button onClick={simulateStudentScan} className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">Quét sinh viên</button>
+                <button onClick={simulateStudentScan} className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">Quét người dùng</button>
                 <button onClick={simulateTemporaryScan} className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">Quét khách</button>
               </div>
             </div>

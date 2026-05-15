@@ -104,6 +104,26 @@ Student subscription can be activated by a completed payment or by wallet balanc
 - `POST /api/lecturer/quota/purchase`
 
 Lecturer quota is auto-created for the current month if no quota exists. Check-in increases `currentUsage`. Quota purchase increases `monthlyLimit`. Frequency is calculated from parking sessions.
+## 8. Implemented Admin APIs
+
+-`GET /api/admin/users`
+- `PATCH /api/admin/users/{userId}`
+- `GET /api/admin/users/{userId}`
+- `GET /api/admin/audit-logs`
+- `GET /api/admin/policy/pricing`
+- `POST /api/admin/policy/pricing`
+
+## 9. Implemented Employee APIs
+
+- `POST /api/employee/manual-checkin`
+- `POST /api/employee/manual-checkout`
+- `GET /api/employee/incidents`
+
+## 10. Implemented Visitor APIs
+
+- `POST /api/visitor/check-in`
+- `POST /api/visitor/check-out` 
+- `POST /api/visitor/payment`
 
 ## 8. Shared modules teammate should reuse
 

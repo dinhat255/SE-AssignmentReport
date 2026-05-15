@@ -7,7 +7,9 @@ const studentRoutes = require('./student.routes');
 const lecturerRoutes = require('./lecturer.routes');
 const paymentRoutes = require('./payment.routes');
 const debugRoutes = require('./debug.routes');
-
+const adminRoutes = require('./admin.routes');
+const employeeRoutes = require('./employee.routes');
+const visitorRoutes = require('./visitor.routes');
 const router = express.Router();
 
 router.get('/health', (_req, res) => {
@@ -22,4 +24,7 @@ router.use('/lecturer', lecturerRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/debug', debugRoutes);
 
+router.use('/admin', adminRoutes);
+router.use('/employee', employeeRoutes);
+router.use('/visitor', visitorRoutes);
 module.exports = router;

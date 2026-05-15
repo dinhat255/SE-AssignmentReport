@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getHistory } from '../../../mocks/mockData';
 import { getStoredRole, getStoredUserId } from '../../api/client';
 import { studentApi } from '../../api/studentApi';
@@ -17,12 +17,15 @@ interface HistoryEntry {
 
 export function MyHistory() {
   const accountRole = getStoredRole('student');
-  const [selectedPeriod, setSelectedPeriod] = useState('Tháng này');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [historyData, setHistoryData] = useState<HistoryEntry[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // filtered results computed client-side
+  const [filteredData, setFilteredData] = useState<HistoryEntry[]>([]);
 
   // fetch paginated history from mock layer
   useEffect(() => {
@@ -34,12 +37,13 @@ export function MyHistory() {
           ? await studentApi.getParkingHistory(getStoredUserId(), currentPage, itemsPerPage)
           : await getHistory(currentPage, itemsPerPage);
         if (!mounted) return;
-        setHistoryData(res.data.map((entry: any) => ({
+        const mapped = res.data.map((entry: any) => ({
           ...entry,
           fee: typeof entry.fee === 'number' ? `${entry.fee.toLocaleString()} VND` : entry.fee,
-          cardType: entry.cardType || 'Tháº» thĂ¡ng',
+          cardType: entry.cardType || 'Thẻ tháng',
           status: 'active',
-        })) as HistoryEntry[]);
+        })) as HistoryEntry[];
+        setHistoryData(mapped);
         setTotal(res.total);
       } catch (err) {
         if (!mounted) return;
@@ -59,10 +63,51 @@ export function MyHistory() {
     return () => { mounted = false; };
   }, [accountRole, currentPage]);
 
-  const totalPages = Math.ceil(total / itemsPerPage);
+  // When searchQuery changes, fetch more data (all) and filter client-side for simplicity
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (!searchQuery) {
+        setFilteredData(historyData);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        // attempt to get all history - using mock getHistory with large limit
+        const res = await getHistory(1, 1000);
+        if (!mounted) return;
+        const mapped = res.data as HistoryEntry[];
+        const q = searchQuery.toLowerCase();
+        const filtered = mapped.filter((entry) =>
+          `${entry.date} ${entry.timeIn} ${entry.timeOut} ${entry.slot} ${entry.duration} ${entry.cardType} ${entry.fee}`
+            .toLowerCase()
+            .includes(q)
+        );
+        setFilteredData(filtered);
+        setTotal(filtered.length);
+        setCurrentPage(1);
+      } catch {
+        // fallback: filter current page
+        const q = searchQuery.toLowerCase();
+        setFilteredData(historyData.filter((entry) =>
+          `${entry.date} ${entry.timeIn} ${entry.timeOut} ${entry.slot} ${entry.duration} ${entry.cardType} ${entry.fee}`
+            .toLowerCase()
+            .includes(q)
+        ));
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+
+    return () => { mounted = false; };
+  }, [searchQuery, historyData]);
+
+  const totalPages = Math.ceil(total / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = historyData;
+  const source = searchQuery ? filteredData : historyData;
+  const currentData = source.slice(startIndex, Math.min(endIndex, source.length));
 
   return (
     <div className="p-6">
@@ -70,15 +115,25 @@ export function MyHistory() {
       <div className="mb-6 flex justify-between items-start">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Lịch sử của tôi</h1>
-          <p className="text-gray-600">Kiểm tra lịch sử đậu xe và giao dịch của bạn.</p>
+          <p className="text-gray-600">Kiểm tra toàn bộ lịch sử đậu xe và giao dịch của bạn.</p>
         </div>
         
-        {/* Period Selector */}
-        <div className="relative">
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            <span className="text-gray-700">{selectedPeriod}</span>
-            <ChevronDown className="w-4 h-4 text-gray-500" />
-          </button>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Tìm theo ngày, chỗ, phí..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={() => { setSearchQuery(''); setFilteredData(historyData); }}
+              className="px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-700"
+            >
+              Xóa
+            </button>
+          </div>
         </div>
       </div>
 
@@ -120,9 +175,9 @@ export function MyHistory() {
         </div>
 
         {/* Pagination */}
-        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
           <div className="text-sm text-gray-600">
-            Hiển thị {startIndex + 1} đến {Math.min(endIndex, historyData.length)} trong {historyData.length} mục
+            Hiển thị {startIndex + 1} đến {Math.min(endIndex, source.length)} trong {source.length} mục
           </div>
           
           <div className="flex items-center gap-2">

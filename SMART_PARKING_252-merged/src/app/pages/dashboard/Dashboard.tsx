@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { Car, Calendar, CreditCard, ArrowRight, Clock, CheckCircle2 } from 'lucide-react';
 import { getLoginFrequency, getParkingMap } from '../../../mocks/mockData';
-import { getStoredRole, getStoredUserId } from '../../api/client';
+import { getLoginFrequencyFromStoredLogins, getStoredRole, getStoredUserId } from '../../api/client';
 import { lecturerApi, type LecturerQuota } from '../../api/lecturerApi';
 import { parkingApi, type ParkingMapResponse } from '../../api/parkingApi';
 import { studentApi, type StudentProfile } from '../../api/studentApi';
@@ -94,16 +94,18 @@ export function Dashboard() {
   }, [isLecturer, isStudent]);
 
   const [loginFrequency, setLoginFrequency] = useState<{ month: string; count: number }[]>([]);
-  const [maxCount, setMaxCount] = useState(1);
+  const maxCount = Math.max(...loginFrequency.map((item) => item.count), 1);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const data = await getLoginFrequency({ period: 'monthly', role: accountRole });
+        const storedFrequency = getLoginFrequencyFromStoredLogins(accountRole);
+        const data = storedFrequency.length > 0
+          ? storedFrequency
+          : await getLoginFrequency({ period: 'monthly', role: accountRole });
         if (!mounted) return;
         setLoginFrequency(data);
-        setMaxCount(Math.max(...data.map((d) => d.count), 1));
       } catch (err) {
         if (mounted) setError('Không lấy được dữ liệu tần suất đăng nhập.');
       }

@@ -6,6 +6,10 @@ const lecturerQuotas = require('./lecturerQuotas.data');
 const payments = require('./payments.data');
 const auditLogs = require('./auditLogs.data');
 
+const visitorTickets = require('./visitorTickets.data');
+const maintenanceIssues = require('./maintenanceIssues.data');
+const policies = require('./policies.data');
+
 function replaceAll(target, items) {
   target.splice(0, target.length, ...items);
 }
@@ -120,7 +124,55 @@ function resetData() {
       cardType: 'Lecturer',
     },
   ]);
+  replaceAll(visitorTickets, [
+    {
+      ticketId: 'VT-001',
+      vehiclePlate: '59Z-12345',
+      checkInTime: '2026-05-12T08:00:00Z',
+      checkOutTime: null,
+      fee: 0,
+      status: 'ACTIVE',
+    },
+  ]);
 
+  // Add maintenance issues
+  replaceAll(maintenanceIssues, [
+    {
+      id: 'M001',
+      spotId: 'A04',
+      sensorId: 'SENSOR-A04-001',
+      title: 'Không phát hiện xe',
+      description: 'Cảm biến không phát hiện xe mặc dù có xe đậu tại vị trí này',
+      type: 'HARDWARE',
+      severity: 'Nghiêm trọng',
+      status: 'Chưa xử lý',
+      reportedBy: 'Hệ thống',
+      reportedAt: '2026-04-08 08:15',
+    },
+    {
+      id: 'M002',
+      spotId: 'B07',
+      sensorId: 'SENSOR-B07-002',
+      title: 'Sai lệch khoảng cách',
+      description: 'Cảm biến báo khoảng cách không chính xác',
+      type: 'HARDWARE',
+      severity: 'Cảnh báo',
+      status: 'Đang xử lý',
+      reportedBy: 'Hệ thống',
+      reportedAt: '2026-04-08 07:30',
+    },
+  ]);
+
+  // Add pricing policy
+  replaceAll(policies, [
+    {
+      id: 'policy-pricing-001',
+      type: 'VISITOR_HOURLY_RATE',
+      value: 5000,
+      currency: 'VND',
+      effectiveFrom: '2026-01-01',
+    },
+  ]);
   replaceAll(subscriptions, [
     {
       id: 'sub-student-001',
