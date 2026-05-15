@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ArrowLeft, Eye, EyeOff, ParkingSquare, GraduationCap, ShieldCheck, UserCircle } from 'lucide-react';
+import logoImage from "/src/assets/01_logobachkhoa.png";
 import { authApi } from '../api/authApi';
 import { saveAuthSession } from '../api/client';
 
@@ -126,11 +127,8 @@ export function Login() {
         <div className="relative z-10 flex flex-col justify-between p-10 text-white w-full">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 text-white">
-            <div className="w-20 h-20 rounded bg-white/10 flex items-center justify-center">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="24" height="24" rx="4" fill="#ffffff" fillOpacity="0.12" />
-                <text x="12" y="16" textAnchor="middle" fontSize="10" fill="#ffffff" fontFamily="sans-serif">BK</text>
-              </svg>
+            <div className="w-20 h-20">
+              <img src={logoImage} alt="Logo BK TPHCM" className="w-full h-full object-contain" />
             </div>
             <div>
               <div className="font-bold">Hệ Thống Đậu Xe Thông Minh</div>
@@ -228,11 +226,8 @@ export function Login() {
               {accountType === 'hcmut' && (
                 <>
                   <button className="w-full border-2 border-blue-600 text-blue-600 py-3 rounded-xl hover:bg-blue-50 transition-colors font-medium mb-4 flex items-center justify-center gap-2">
-                    <div className="w-6 h-6 flex items-center justify-center">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="24" height="24" rx="4" fill="#0ea5e9" />
-                        <text x="12" y="16" textAnchor="middle" fontSize="8" fill="#ffffff" fontFamily="sans-serif">BK</text>
-                      </svg>
+                    <div className="w-6 h-6">
+                      <img src={logoImage} alt="Logo BK" className="w-full h-full object-contain" />
                     </div>
                     Đăng nhập bằng HCMUT SSO
                   </button>
