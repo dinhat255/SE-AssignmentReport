@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Parking</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+<div class="flex h-screen">
+
+  <!-- Sidebar -->
+  <div class="w-64 bg-blue-900 text-white p-5">
+    <h2 class="text-xl font-bold mb-6">🚗 Smart Parking</h2>
+    <ul class="space-y-4">
+      <li class="bg-blue-700 p-2 rounded">Tổng quan</li>
+      <li>Bãi xe</li>
+      <li>Lịch sử</li>
+      <li id="menu-payment">Thanh toán</li>
+      <li id="menu-privilege">Quyền lợi</li>
+      <li>Hồ sơ</li>
+    </ul>
+  </div>
+
+  <!-- Main -->
+  <div class="flex-1 p-6">
+
+    <!-- Topbar -->
+    <div class="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
+      <h1 class="text-xl font-bold">Chào mừng trở lại, <span class="text-blue-600">Lâm</span> 👋</h1>
+
+      <div class="flex items-center gap-4">
+        <!-- Chọn role -->
+        <select id="roleSelect" class="border p-2 rounded">
+          <option value="student">Sinh viên</option>
+          <option value="lecturer">Giảng viên</option>
+        </select>
+
+        <!-- Logout -->
+        <button class="bg-red-500 text-white px-3 py-2 rounded">Đăng xuất</button>
+      </div>
+    </div>
+
+    <!-- Dashboard cards -->
+    <div class="grid grid-cols-3 gap-6 mb-6">
+      <div class="bg-white p-5 rounded shadow">
+        <h3 class="text-gray-500">Chỗ trống</h3>
+        <p class="text-2xl font-bold text-green-600">120</p>
+      </div>
+      <div class="bg-white p-5 rounded shadow">
+        <h3 class="text-gray-500">Trạng thái</h3>
+        <p class="text-xl font-bold text-yellow-500">Gần đầy</p>
+      </div>
+      <div class="bg-white p-5 rounded shadow">
+        <h3 class="text-gray-500">Khu đề xuất</h3>
+        <p class="text-xl font-bold">Khu B</p>
+      </div>
+    </div>
+
+    <!-- Thống kê -->
+    <div class="bg-white p-6 rounded shadow mb-6">
+      <h2 class="text-xl font-bold mb-4">Thống kê đăng nhập</h2>
+
+      <!-- Biểu đồ -->
+      <div class="flex items-end gap-4 h-40 mb-6">
+        <div class="bg-red-500 w-6" style="height: 30%"></div>
+        <div class="bg-red-500 w-6" style="height: 60%"></div>
+        <div class="bg-red-500 w-6" style="height: 80%"></div>
+        <div class="bg-red-500 w-6" style="height: 50%"></div>
+      </div>
+
+      <!-- Tháng/Năm -->
+      <div class="flex justify-between text-sm text-gray-600 mb-6">
+        <span>03/2026</span>
+        <span>04/2026</span>
+        <span>05/2026</span>
+        <span>06/2026</span>
+      </div>
+
+      <!-- Tình trạng khu (dọc) -->
+      <h3 class="font-bold mb-2">Tình trạng bãi xe theo khu</h3>
+      <div class="space-y-4">
+        <div>
+          <p>Khu A - 20 chỗ trống</p>
+          <div class="w-full bg-gray-200 h-3 rounded">
+            <div class="bg-green-500 h-3 rounded" style="width: 80%"></div>
+          </div>
+        </div>
+        <div>
+          <p>Khu B - 5 chỗ trống</p>
+          <div class="w-full bg-gray-200 h-3 rounded">
+            <div class="bg-red-500 h-3 rounded" style="width: 20%"></div>
+          </div>
+        </div>
+        <div>
+          <p>Khu C - 15 chỗ trống</p>
+          <div class="w-full bg-gray-200 h-3 rounded">
+            <div class="bg-yellow-500 h-3 rounded" style="width: 60%"></div>
+          </div>
+        </div>
+        <div>
+          <p>Khu D - 10 chỗ trống</p>
+          <div class="w-full bg-gray-200 h-3 rounded">
+            <div class="bg-yellow-500 h-3 rounded" style="width: 50%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sinh viên -->
+    <div id="studentUI" class="bg-white p-6 rounded shadow mb-6">
+      <h2 class="text-xl font-bold mb-4">Gói gửi xe</h2>
+      <button class="bg-blue-600 text-white px-4 py-2 rounded">Thanh toán BKPay</button>
+    </div>
+
+    <!-- Giảng viên -->
+    <div id="lecturerUI" class="bg-white p-6 rounded shadow mb-6 hidden">
+      <h2 class="text-xl font-bold mb-4">Quyền lợi gửi xe</h2>
+      <p>15 / 20 lượt</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const roleSelect = document.getElementById("roleSelect");
+  const studentUI = document.getElementById("studentUI");
+  const lecturerUI = document.getElementById("lecturerUI");
+  const menuPayment = document.getElementById("menu-payment");
+  const menuPrivilege = document.getElementById("menu-privilege");
+
+  function updateUI(role) {
+    if (role === "student") {
+      studentUI.classList.remove("hidden");
+      lecturerUI.classList.add("hidden");
+      menuPayment.style.display = "block";
+      menuPrivilege.style.display = "none";
+    } else {
+      studentUI.classList.add("hidden");
+      lecturerUI.classList.remove("hidden");
+      menuPayment.style.display = "none";
+      menuPrivilege.style.display = "block";
+    }
+  }
+
+  roleSelect.addEventListener("change", (e) => {
+    updateUI(e.target.value);
+  });
+
+  updateUI("student");
+</script>
+
+</body>
+</html>

@@ -1,0 +1,647 @@
+openapi: 3.0.3
+info:
+  title: Smart Parking Backend API
+  version: 0.2.0
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: Health
+  - name: Debug
+  - name: Auth
+  - name: Users
+  - name: Parking
+  - name: Student
+  - name: Lecturer
+  - name: Payments
+  - name: Admin
+  - name: Employee
+  - name: Visitor
+  - name: Reports    
+components:
+  responses:
+    InvalidCredentials:
+      description: Invalid credentials
+      content:
+        application/json:
+          example: { success: false, error: { code: INVALID_CREDENTIALS, message: Invalid email or password } }
+    Unauthorized:
+      description: Missing or invalid token
+      content:
+        application/json:
+          example: { success: false, error: { code: UNAUTHORIZED, message: Invalid authorization token } }
+    BusinessError:
+      description: Business rule violation
+      content:
+        application/json:
+          examples:
+            subscriptionRequired:
+              value: { success: false, error: { code: SUBSCRIPTION_REQUIRED, message: Student needs an active subscription to check in } }
+            quotaExceeded:
+              value: { success: false, error: { code: QUOTA_EXCEEDED, message: Lecturer monthly parking quota is exhausted } }
+            duplicateActiveSession:
+              value: { success: false, error: { code: DUPLICATE_ACTIVE_SESSION, message: User already has an active parking session } }
+            noAvailableSpot:
+              value: { success: false, error: { code: NO_AVAILABLE_SPOT, message: No available parking spot } }
+            paymentNotFound:
+              value: { success: false, error: { code: PAYMENT_NOT_FOUND, message: Payment not found } }
+            paymentExpired:
+              value: { success: false, error: { code: PAYMENT_EXPIRED, message: Payment QR token has expired } }
+paths:
+  /api/health:
+    get:
+      tags: [Health]
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              example: { success: true, data: { status: ok, service: smart-parking-backend } }
+  /api/debug/state:
+    get:
+      tags: [Debug]
+      summary: Get in-memory state summary
+      responses:
+        "200":
+          description: State summary
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  users: 4
+                  parkingSpots: 40
+                  activeSessions: 0
+                  subscriptions: 1
+                  lecturerQuotas: 1
+                  payments: 0
+                  auditLogs: 0
+                  latestAuditLogs: []
+  /api/debug/reset:
+    post:
+      tags: [Debug]
+      summary: Reset all in-memory data to seed
+      responses:
+        "200":
+          description: Reset state
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with seeded credentials and create a mock token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            examples:
+              student:
+                value: { email: student@hcmut.edu.vn, password: student123, provider: HCMUT_SSO }
+              lecturer:
+                value: { email: lecturer@hcmut.edu.vn, password: lecturer123, provider: HCMUT_SSO }
+      responses:
+        "200":
+          description: Login success
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  accessToken: mock-token:u-student-001
+                  user:
+                    id: u-student-001
+                    fullName: Nguyen Van Sinh Vien
+                    email: student@hcmut.edu.vn
+                    role: student
+                    cardId: STU-CARD-001
+                    vehiclePlate: 59A1-12345
+                    balance: 100000
+        "401":
+          $ref: "#/components/responses/InvalidCredentials"
+  /api/users/me:
+    get:
+      tags: [Users]
+      summary: Get current user from Authorization Bearer mock-token
+      parameters:
+        - in: header
+          name: Authorization
+          schema: { type: string, example: "Bearer mock-token:u-student-001" }
+        - in: query
+          name: userId
+          schema: { type: string }
+          description: Fallback for manual testing
+      responses:
+        "200":
+          description: Current user without password
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/parking/map:
+    get:
+      tags: [Parking]
+      summary: Get deterministic parking map from in-memory spots
+      responses:
+        "200":
+          description: Parking map
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  updatedAt: "2026-05-12T10:30:00.000Z"
+                  summary: { available: 37, occupied: 2, maintenance: 1, total: 40 }
+                  spots:
+                    - { id: A01, zone: A, status: AVAILABLE, sensorId: SENSOR-A01, occupiedByCurrentUser: false }
+                    - { id: D10, zone: D, status: MAINTENANCE, sensorId: SENSOR-D10, occupiedByCurrentUser: false }
+  /api/parking/zones/status:
+    get:
+      tags: [Parking]
+      summary: Get zone status summary
+      responses:
+        "200":
+          description: Zone status
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  - { zone: A, available: 10, occupied: 0, maintenance: 0, total: 10, status: AVAILABLE }
+  /api/parking/check-in:
+    post:
+      tags: [Parking]
+      summary: Check in internal student or lecturer card
+      requestBody:
+        content:
+          application/json:
+            example: { userId: u-student-001, cardId: STU-CARD-001, vehiclePlate: 59A1-12345 }
+      responses:
+        "201":
+          description: Checked in
+          content:
+            application/json:
+              example:
+                success: true
+                data: { sessionId: ps-1778589000000, userId: u-student-001, assignedSlot: A01, entryTime: "2026-05-12T10:30:00.000Z", timeIn: "17:30", status: ACTIVE }
+        "400":
+          $ref: "#/components/responses/BusinessError"
+        "403":
+          $ref: "#/components/responses/BusinessError"
+        "409":
+          $ref: "#/components/responses/BusinessError"
+  /api/parking/check-out:
+    post:
+      tags: [Parking]
+      summary: Complete an active parking session
+      requestBody:
+        content:
+          application/json:
+            example: { userId: u-student-001, sessionId: ps-1778589000000 }
+      responses:
+        "200":
+          description: Checked out
+          content:
+            application/json:
+              example:
+                success: true
+                data: { sessionId: ps-1778589000000, userId: u-student-001, slot: A01, timeIn: "17:30", timeOut: "18:30", duration: 1h00m, fee: 0, status: COMPLETED }
+  /api/student/profile:
+    get:
+      tags: [Student]
+      summary: Get student profile, balance, active subscription and vehicle
+      parameters:
+        - in: header
+          name: Authorization
+          schema: { type: string, example: "Bearer mock-token:u-student-001" }
+        - in: query
+          name: userId
+          schema: { type: string }
+      responses:
+        "200":
+          description: Student profile
+  /api/student/subscribe:
+    post:
+      tags: [Student]
+      summary: Subscribe a student using completed payment token or wallet balance
+      requestBody:
+        content:
+          application/json:
+            example: { userId: u-student-001, month: 5, year: 2026, paymentToken: PAY_123 }
+      responses:
+        "201":
+          description: Subscription active
+        "400":
+          $ref: "#/components/responses/BusinessError"
+  /api/student/topup:
+    post:
+      tags: [Student]
+      summary: Increase student wallet balance
+      requestBody:
+        content:
+          application/json:
+            example: { userId: u-student-001, amount: 50000 }
+      responses:
+        "201":
+          description: Top-up completed
+  /api/student/parking-history:
+    get:
+      tags: [Student]
+      summary: Get paginated student parking history
+      parameters:
+        - in: query
+          name: userId
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 5 }
+      responses:
+        "200":
+          description: Student parking history
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  data:
+                    - { sessionId: ps-001, date: "2026-05-11", timeIn: "07:30", timeOut: "11:20", slot: B07, duration: 3h50m, fee: 5000, status: COMPLETED }
+                  total: 2
+                  page: 1
+                  limit: 5
+  /api/lecturer/profile:
+    get:
+      tags: [Lecturer]
+      summary: Get lecturer profile with current quota
+      responses:
+        "200":
+          description: Lecturer profile
+  /api/lecturer/quota:
+    get:
+      tags: [Lecturer]
+      summary: Get or create lecturer quota for current month
+      parameters:
+        - in: query
+          name: userId
+          schema: { type: string }
+      responses:
+        "200":
+          description: Lecturer quota
+          content:
+            application/json:
+              example:
+                success: true
+                data: { userId: u-lecturer-001, month: 5, year: 2026, monthlyLimit: 50, currentUsage: 15, remaining: 35 }
+  /api/lecturer/entry-history:
+    get:
+      tags: [Lecturer]
+      summary: Get lecturer entry history from parking sessions
+      parameters:
+        - in: query
+          name: userId
+          schema: { type: string }
+      responses:
+        "200":
+          description: Lecturer entry history
+  /api/lecturer/frequency:
+    get:
+      tags: [Lecturer]
+      summary: Get lecturer monthly frequency calculated from sessions
+      parameters:
+        - in: query
+          name: userId
+          schema: { type: string }
+      responses:
+        "200":
+          description: Lecturer frequency
+  /api/lecturer/quota/purchase:
+    post:
+      tags: [Lecturer]
+      summary: Purchase extra lecturer quota using a completed payment token
+      requestBody:
+        content:
+          application/json:
+            example: { userId: u-lecturer-001, quantity: 5, paymentToken: PAY_123 }
+      responses:
+        "201":
+          description: Quota updated
+  /api/payments/bkpay/qr:
+    post:
+      tags: [Payments]
+      summary: Create BKPay QR payment intent without confirming it
+      requestBody:
+        content:
+          application/json:
+            examples:
+              studentSubscription:
+                value:
+                  amount: 50000
+                  role: student
+                  context: { type: STUDENT_SUBSCRIPTION, userId: u-student-001 }
+                  expiresInSeconds: 300
+              lecturerQuota:
+                value:
+                  amount: 50000
+                  role: lecturer
+                  context: { type: LECTURER_QUOTA_PURCHASE, userId: u-lecturer-001, quantity: 10 }
+                  expiresInSeconds: 300
+      responses:
+        "201":
+          description: QR created
+          content:
+            application/json:
+              example:
+                success: true
+                data: { qrImageUrl: "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=PAY_123", qrToken: PAY_123, expiresInSeconds: 300 }
+  /api/payments/{qrToken}/status:
+    get:
+      tags: [Payments]
+      summary: Get payment status
+      parameters:
+        - in: path
+          name: qrToken
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Payment status
+        "404":
+          $ref: "#/components/responses/BusinessError"
+  /api/payments/{qrToken}/confirm:
+    post:
+      tags: [Payments]
+      summary: Confirm payment and apply subscription or lecturer quota effect
+      parameters:
+        - in: path
+          name: qrToken
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Payment confirmed with effect
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  payment: { qrToken: PAY_123, status: COMPLETED, amount: 50000 }
+                  effect:
+                    type: STUDENT_SUBSCRIPTION
+                    subscription: { id: sub-1778589000000, userId: u-student-001, status: ACTIVE, month: 5, year: 2026 }
+        "400":
+          $ref: "#/components/responses/BusinessError"
+        "404":
+          $ref: "#/components/responses/BusinessError"
+  /api/admin/users:
+    get:
+      tags: [Admin]
+      summary: Display the user list
+      parameters:
+        - name: role
+          in: query
+          schema: { type: string, enum: [student, lecturer, employee] }
+        - name: search
+          in: query
+          description: Search by name or email
+          schema: { type: string }
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              example: { success: true, data: [{ id: "u-01", fullName: "Nguyen Van A" }] }
+
+  /api/admin/users/{userId}:
+    patch:
+      tags: [Admin]
+      summary: Update user information
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName: { type: string }
+                balance: { type: number }
+            example: { fullName: "Nguyen Van B", balance: 500000 }
+      responses:
+        "200":
+          description: Success
+          /api/admin/parking/analytics:
+    get:
+      tags: [Admin]
+      summary: Get parking analytics and statistics
+      parameters:
+        - name: startDate
+          in: query
+          description: Start date (format: YYYY-MM-DD)
+          schema: { type: string, format: date }
+        - name: endDate
+          in: query
+          description: End date (format: YYYY-MM-DD)
+          schema: { type: string, format: date }
+        - name: zone
+          in: query
+          description: Filter by zone (e.g., Zone A, Zone B)
+          schema: { type: string }
+      responses:
+        "200":
+          description: Return analytics data (occupancy rate, expected revenue...)
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  totalSpots: 500
+                  occupiedSpots: 350
+                  revenue: 15000000
+                  occupancyRate: "70%"
+
+  /api/admin/audit-logs:
+    get:
+      tags: [Admin]
+      summary: View system activity logs (Audit Logs)
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of records to return
+          schema: { type: integer, default: 50 }
+        - name: action
+          in: query
+          description: Filter by action (e.g., LOGIN, UPDATE_USER, DELETE)
+          schema: { type: string }
+        - name: userId
+          in: query
+          description: Filter logs for a specific user
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of system logs
+          content:
+            application/json:
+              example:
+                success: true
+                logs:
+                  - timestamp: "2026-05-13T10:00:00Z"
+                    userId: "admin-01"
+                    action: "UPDATE_POLICY"
+                    details: "Change hourly ticket price for motorcycles"
+  /api/employee/manual-checkin:
+    post:
+      tags: [Employee]
+      summary: manual-checkin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vehiclePlate: { type: string }
+                cardId: { type: string }
+            example: { vehiclePlate: "59A-12345", cardId: "STU-001" }
+      responses:
+        "201":
+          description: Success
+  /api/employee/manual-checkout:
+    post:
+      tags: [Employee]
+      summary: manual-checkout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ticketId: { type: string, description: "ID của vé cần check-out" }
+                reason: { type: string, description: "Lý do cho ra thủ công" }
+            example:
+              ticketId: "TIC-123456"
+              reason: "Guest card damaged, cash collected"
+      responses:
+        "200":
+          description: Success
+  /api/employee/incidents:
+    get:
+      tags:
+        - Employee
+      summary: "Handle maintenance issues"
+      parameters:
+        - name: statuss
+          in: query
+          schema:
+            type: string
+          description: "Lọc theo trạng thái (Ví dụ: Chưa xử lý, Đang xử lý, Đã xử lý)"
+        - name: spotId
+          in: query
+          schema:
+            type: string
+          description: "Lọc theo vị trí (Ví dụ: A01)"
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: "Thành công"
+          content:
+            application/json:
+              example:
+                incidents:
+                  - id: "M001"
+                    spotId: "A01"
+                    title: "Sensor lỗi khu A"
+                    status: "Chưa xử lý"
+                    severity: "Cảnh báo"
+                    reportedAt: "2026-05-14 10:30"
+                total: 5
+  /api/visitor/check-in:
+    post:
+      tags: [Visitor]
+      summary: Visitor checks in
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vehiclePlate: { type: string }
+            example: { vehiclePlate: "51F-9999" }
+      responses:
+        "201":
+          description: Returns ticket information (ticketId)
+
+  /api/visitor/check-out:
+    post:
+      tags: [Visitor]
+      summary: Visitor requests to leave (calculate fee)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ticketId: { type: string }
+            example: { ticketId: "VIS-123456" }
+      responses:
+        "200":
+          description: Returns the amount due
+          content:
+            application/json:
+              example: { success: true, data: { fee: 10000, stayDuration: "2h" } }
+
+  /api/visitor/payment:
+    post:
+      tags: [Visitor]
+      summary: Pay parking fee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ticketId: { type: string }
+                amount: { type: number }
+            example: { ticketId: "VIS-123456", amount: 10000 }
+      responses:
+        "200":
+          description: Payment successful, gate opened
+  /api/reports/{type}/export:
+    get:
+      tags: [Reports]
+      summary: Export report file (Excel/PDF)
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema: { type: string, enum: [revenue, occupancy, user-activity] }
+        - name: format
+          in: query
+          schema: { type: string, enum: [pdf, excel], default: excel }
+        - name: startDate
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: Returns the download file
+  /api/admin/policy/pricing:
+    get:
+      tags: [Admin]
+      summary: policy/pricing
+      responses:
+        "200":
+          description: OK
+    post:
+      tags: [Admin]
+      summary: Update pricing policy
+      responses:
+        "200":
+          description: OK
