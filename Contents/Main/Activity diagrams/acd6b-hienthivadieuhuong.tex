@@ -1,0 +1,44 @@
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        font=\small,
+        node distance=0.85cm,
+        action/.style={draw, rounded corners, align=center, text width=5.8cm, minimum height=0.8cm},
+        decision/.style={draw, diamond, aspect=2.3, align=center, text width=3.3cm, inner sep=1pt},
+        flow/.style={->, >=stealth}
+    ]
+        \node[circle, fill=black, minimum size=0.25cm, inner sep=0pt] (start) {};
+        \node[action, below=of start] (request) {Người dùng hoặc thiết bị hiển thị yêu cầu xem trạng thái bãi xe};
+        \node[action, below=of request] (load) {Hệ thống truy xuất trạng thái đã cập nhật từ UC006A};
+        \node[decision, below=of load] (fresh) {Dữ liệu còn hiệu lực?};
+        \node[action, below left=1.0cm and 1.4cm of fresh] (stale) {Hiển thị cảnh báo dữ liệu có thể bị trễ};
+        \node[action, below right=1.0cm and 1.4cm of fresh] (display) {Hiển thị trạng thái từng khu vực};
+        \node[decision, below=of display] (full) {Toàn bộ bãi xe đã đầy?};
+        \node[action, below left=1.0cm and 1.0cm of full] (fullmsg) {Thông báo hết chỗ, không điều hướng};
+        \node[action, below right=1.0cm and 1.0cm of full] (select) {Chọn khu vực phù hợp theo vai trò và số chỗ trống};
+        \node[decision, below=of select] (channel) {Kênh hiển thị?};
+        \node[action, below left=1.0cm and 1.0cm of channel] (short) {Hiển thị khu vực đề xuất và chỉ dẫn ngắn gọn};
+        \node[action, below right=1.0cm and 1.0cm of channel] (map) {Hiển thị bản đồ hoặc hướng dẫn chi tiết};
+        \node[action, below=1.0cm of channel] (record) {Ghi nhận yêu cầu tra cứu/điều hướng};
+        \node[circle, draw, minimum size=0.35cm, inner sep=0pt, below=of record] (end) {\scriptsize};
+        \node[circle, fill=black, minimum size=0.18cm, inner sep=0pt] at (end) {};
+
+        \draw[flow] (start) -- (request);
+        \draw[flow] (request) -- (load);
+        \draw[flow] (load) -- (fresh);
+        \draw[flow] (fresh) -- node[above left]{Không} (stale);
+        \draw[flow] (fresh) -- node[above right]{Có} (display);
+        \draw[flow] (stale) |- (display);
+        \draw[flow] (display) -- (full);
+        \draw[flow] (full) -- node[above left]{Có} (fullmsg);
+        \draw[flow] (full) -- node[above right]{Không} (select);
+        \draw[flow] (fullmsg) |- (record);
+        \draw[flow] (select) -- (channel);
+        \draw[flow] (channel) -- node[above left]{Bảng điện tử} (short);
+        \draw[flow] (channel) -- node[above right]{UI/Kiosk} (map);
+        \draw[flow] (short) |- (record);
+        \draw[flow] (map) |- (record);
+        \draw[flow] (record) -- (end);
+    \end{tikzpicture}
+    \caption{Activity diagram cho UC006B - Hiển thị trạng thái bãi xe và điều hướng người dùng}
+\end{figure}

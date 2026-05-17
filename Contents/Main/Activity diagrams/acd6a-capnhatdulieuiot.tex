@@ -1,0 +1,39 @@
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        font=\small,
+        node distance=0.85cm,
+        action/.style={draw, rounded corners, align=center, text width=5.6cm, minimum height=0.8cm},
+        decision/.style={draw, diamond, aspect=2.3, align=center, text width=3.2cm, inner sep=1pt},
+        flow/.style={->, >=stealth}
+    ]
+        \node[circle, fill=black, minimum size=0.25cm, inner sep=0pt] (start) {};
+        \node[action, below=of start] (receive) {IoT Gateway gửi dữ liệu cảm biến};
+        \node[action, below=of receive] (validate) {Hệ thống kiểm tra định dạng, nguồn gửi và thời điểm dữ liệu};
+        \node[decision, below=of validate] (valid) {Dữ liệu hợp lệ?};
+        \node[action, below left=1.0cm and 1.5cm of valid] (reject) {Từ chối gói dữ liệu, ghi log lỗi};
+        \node[action, below right=1.0cm and 1.5cm of valid] (map) {Ánh xạ cảm biến với chỗ đỗ và khu vực};
+        \node[action, below=of map] (aggregate) {Tổng hợp số chỗ trống và xác định trạng thái khu vực};
+        \node[decision, below=of aggregate] (consistent) {Dữ liệu nhất quán?};
+        \node[action, below left=1.0cm and 1.0cm of consistent] (unknown) {Đánh dấu khu vực không xác định và gửi cảnh báo};
+        \node[action, below right=1.0cm and 1.0cm of consistent] (update) {Cập nhật trạng thái vào CSDL nội bộ};
+        \node[action, below=1.0cm of update] (log) {Ghi log đồng bộ thành công};
+        \node[circle, draw, minimum size=0.35cm, inner sep=0pt, below=of log] (end) {\scriptsize};
+        \node[circle, fill=black, minimum size=0.18cm, inner sep=0pt] at (end) {};
+
+        \draw[flow] (start) -- (receive);
+        \draw[flow] (receive) -- (validate);
+        \draw[flow] (validate) -- (valid);
+        \draw[flow] (valid) -- node[above left]{Không} (reject);
+        \draw[flow] (valid) -- node[above right]{Có} (map);
+        \draw[flow] (reject) |- (end);
+        \draw[flow] (map) -- (aggregate);
+        \draw[flow] (aggregate) -- (consistent);
+        \draw[flow] (consistent) -- node[above left]{Không} (unknown);
+        \draw[flow] (consistent) -- node[above right]{Có} (update);
+        \draw[flow] (unknown) |- (end);
+        \draw[flow] (update) -- (log);
+        \draw[flow] (log) -- (end);
+    \end{tikzpicture}
+    \caption{Activity diagram cho UC006A - Cập nhật dữ liệu trạng thái bãi xe từ IoT Gateway}
+\end{figure}

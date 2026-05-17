@@ -1,0 +1,57 @@
+\begin{center}
+\begin{longtable}{|m{2.7cm}|m{12.8cm}|}
+\hline
+ID Use-case  & UC006A \\ 
+Name Use-case & Cập nhật dữ liệu trạng thái bãi xe từ IoT Gateway \\ 
+\hline
+Actors & Primary actor: IoT Gateway. Supporting actors: Hệ thống Smart Parking, Dịch vụ cảnh báo, Nhân viên vận hành.\\
+\hline
+Description & Use case này mô tả phần hệ thống tiếp nhận, kiểm tra và cập nhật dữ liệu cảm biến từ IoT Gateway. Mục tiêu là duy trì dữ liệu trạng thái chỗ đỗ gần thời gian thực trước khi dữ liệu này được dùng cho màn hình hiển thị hoặc chức năng điều hướng ở UC006B.\\
+\hline
+Trigger & IoT Gateway gửi gói dữ liệu mới về trạng thái các cảm biến chỗ đỗ, hoặc hệ thống nhận lịch đồng bộ định kỳ từ gateway.\\
+\hline
+Preconditions & 
+1. Hệ thống Smart Parking đang hoạt động.
+
+2. Danh sách khu vực, chỗ đỗ và mã cảm biến đã được cấu hình.
+
+3. IoT Gateway có thể gửi dữ liệu qua kênh kết nối đã đăng ký, hoặc hệ thống còn dữ liệu gần nhất để dùng tạm thời.\\
+\hline
+Post conditions & 
+1. Trạng thái chỗ đỗ và khu vực được cập nhật trong cơ sở dữ liệu nội bộ nếu dữ liệu hợp lệ.
+
+2. Hệ thống ghi log thời điểm cập nhật, nguồn dữ liệu và kết quả xử lý.
+
+3. Nếu dữ liệu lỗi hoặc thiếu, hệ thống đánh dấu khu vực liên quan là không xác định và gửi cảnh báo cho nhân viên.\\
+\hline
+Normal flow & 
+1. IoT Gateway gửi dữ liệu cảm biến gồm mã cảm biến, khu vực, trạng thái có xe/trống và thời điểm ghi nhận.
+
+2. Hệ thống tiếp nhận dữ liệu và kiểm tra định dạng, chữ ký nguồn gửi, thời gian cập nhật và độ đầy đủ của dữ liệu.
+
+3. Hệ thống ánh xạ dữ liệu cảm biến với danh sách chỗ đỗ đã cấu hình.
+
+4. Hệ thống tổng hợp số chỗ trống theo từng khu vực.
+
+5. Hệ thống xác định trạng thái khu vực: còn chỗ, gần đầy, đầy hoặc không xác định.
+
+6. Hệ thống cập nhật trạng thái chỗ đỗ, khu vực và thời điểm đồng bộ vào cơ sở dữ liệu nội bộ.
+
+7. Hệ thống ghi log cập nhật thành công để phục vụ giám sát và truy vết.\\
+\hline
+Alternative flow & 
+A1. Nếu gateway gửi dữ liệu theo lô, hệ thống xử lý từng bản ghi cảm biến và chỉ loại bỏ các bản ghi không hợp lệ.
+
+A2. Nếu dữ liệu mới trùng với trạng thái hiện tại, hệ thống chỉ cập nhật thời điểm nhận dữ liệu và ghi log nhận thành công.
+
+A3. Nếu một phần cảm biến trong khu vực không gửi dữ liệu, hệ thống vẫn cập nhật các cảm biến hợp lệ và đánh dấu các vị trí thiếu dữ liệu để kiểm tra sau.\\
+\hline
+Exception flow & 
+E1. Nếu dữ liệu sai định dạng hoặc không xác thực được nguồn gửi, hệ thống từ chối gói dữ liệu và ghi log lỗi.
+
+E2. Nếu IoT Gateway mất kết nối quá ngưỡng cho phép, hệ thống giữ trạng thái gần nhất, đánh dấu dữ liệu có thể bị trễ và gửi cảnh báo cho nhân viên.
+
+E3. Nếu dữ liệu giữa các cảm biến trong cùng khu vực không nhất quán, hệ thống không dùng khu vực đó cho điều hướng tự động cho đến khi có dữ liệu hợp lệ mới hoặc nhân viên xác minh thủ công.\\
+\hline
+\end{longtable}
+\end{center}

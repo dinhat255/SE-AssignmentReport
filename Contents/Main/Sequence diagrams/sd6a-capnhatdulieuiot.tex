@@ -1,0 +1,31 @@
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        font=\small,
+        lifeline/.style={draw, rounded corners, fill=blue!8, minimum width=2.8cm, minimum height=0.8cm},
+        msg/.style={->, >=stealth},
+        note/.style={draw, rounded corners, fill=yellow!15, align=center}
+    ]
+        \node[lifeline] (gateway) at (0,0) {IoT Gateway};
+        \node[lifeline] (system) at (4.4,0) {Hệ thống Smart Parking};
+        \node[lifeline] (db) at (8.8,0) {CSDL nội bộ};
+        \node[lifeline] (alert) at (13.2,0) {Dịch vụ cảnh báo};
+
+        \foreach \x in {0,4.4,8.8,13.2} {
+            \draw[dashed] (\x,-0.45) -- (\x,-8.2);
+        }
+
+        \draw[msg] (0,-1.0) -- node[above]{Gửi dữ liệu cảm biến} (4.4,-1.0);
+        \draw[msg] (4.4,-1.7) -- node[above]{Kiểm tra định dạng, nguồn gửi, thời điểm} (4.4,-2.3);
+        \draw[msg] (4.4,-2.8) -- node[above]{Lấy cấu hình khu vực/chỗ đỗ} (8.8,-2.8);
+        \draw[msg, dashed] (8.8,-3.3) -- node[above]{Trả cấu hình} (4.4,-3.3);
+        \draw[msg] (4.4,-3.9) -- node[above]{Tổng hợp số chỗ trống và trạng thái khu vực} (4.4,-4.6);
+        \draw[msg] (4.4,-5.1) -- node[above]{Cập nhật trạng thái chỗ đỗ/khu vực} (8.8,-5.1);
+        \draw[msg, dashed] (8.8,-5.6) -- node[above]{Cập nhật thành công} (4.4,-5.6);
+        \draw[msg] (4.4,-6.2) -- node[above]{Ghi log đồng bộ} (8.8,-6.2);
+
+        \node[note, text width=4.2cm] at (6.6,-7.3) {Nếu dữ liệu lỗi, thiếu hoặc gateway mất kết nối: đánh dấu khu vực không xác định, giữ dữ liệu gần nhất và gửi cảnh báo};
+        \draw[msg] (4.4,-7.8) -- node[above]{Gửi cảnh báo lỗi dữ liệu} (13.2,-7.8);
+    \end{tikzpicture}
+    \caption{Sequence diagram cho UC006A - Cập nhật dữ liệu trạng thái bãi xe từ IoT Gateway}
+\end{figure}

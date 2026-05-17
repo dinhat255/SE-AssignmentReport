@@ -283,6 +283,19 @@ Các hệ thống tích hợp để hỗ trợ hoạt động của hệ thống
     \end{figure}
     \bigskip
 
+    Để giảm độ phức tạp khi đọc sơ đồ tổng quát, các use case trong hệ thống có thể được diễn giải theo các nhóm chức năng chính như sau:
+
+    \begin{itemize}
+        \item \textbf{Access Control}: bao gồm đăng nhập qua HCMUT SSO, quẹt thẻ nội bộ, quẹt thẻ vãng lai và các bước xác thực quyền ra/vào bãi xe.
+        \item \textbf{Payment}: bao gồm thanh toán tại chỗ cho khách vãng lai và thanh toán trả trước hoặc thanh toán định kỳ thông qua BKPay.
+        \item \textbf{IoT Monitoring and Guidance}: bao gồm cập nhật dữ liệu trạng thái từ IoT Gateway, hiển thị trạng thái bãi xe và điều hướng người dùng đến khu vực phù hợp.
+        \item \textbf{Administration and Reporting}: bao gồm cấu hình chính sách giá, quyền lợi gửi xe, thống kê và xuất báo cáo.
+        \item \textbf{Data Synchronization}: bao gồm đồng bộ thông tin định danh, vai trò người dùng và trạng thái liên quan từ các hệ thống ngoài như HCMUT\_DATACORE và BKPay về hệ thống nội bộ.
+        \item \textbf{Incident Handling}: bao gồm ghi nhận, theo dõi và xử lý các sự cố tại chỗ như mất thẻ, lỗi camera, lỗi cổng hoặc lỗi thanh toán.
+    \end{itemize}
+
+    Trong đó, HCMUT\_DATACORE được xem là nguồn dữ liệu định danh và thông tin người dùng của trường. Các nghiệp vụ vận hành bãi xe như tạo phiên gửi xe, tính phí, đóng phiên, báo cáo và xử lý sự cố vẫn do hệ thống Smart Parking quản lý trong cơ sở dữ liệu nội bộ.
+
 
     \bigskip
 
@@ -301,7 +314,8 @@ Các hệ thống tích hợp để hỗ trợ hoạt động của hệ thống
          \xrowht{30pt}   UC003   & Quẹt thẻ vãng lai      & Khách vãng lai nhận vé hoặc quẹt thẻ tạm thời tại cổng để vào hoặc ra khỏi bãi xe. \\  \hline
          \xrowht{30pt}   UC004   & Thanh toán tại chỗ      & Khách vãng lai thực hiện thanh toán phí gửi xe trực tiếp tại cổng khi rời bãi xe.\\  \hline 
          \xrowht{30pt}   UC005   & Thanh toán trả trước   & Người dùng nội bộ thanh toán phí gửi xe định kỳ thông qua hệ thống BKPay. \\  \hline 
-         \xrowht{30pt}   UC006  & Kiểm tra và điều hướng trạng thái bãi xe & Hệ thống thu thập dữ liệu từ cảm biến và IoT Gateway để hiển thị trạng thái bãi xe (còn chỗ, gần đầy, hết chỗ) và hỗ trợ điều hướng.\\  \hline 
+         \xrowht{30pt}   UC006A  & Cập nhật dữ liệu trạng thái bãi xe từ IoT Gateway & Hệ thống tiếp nhận, kiểm tra và cập nhật dữ liệu cảm biến từ IoT Gateway để duy trì trạng thái chỗ đỗ gần thời gian thực.\\  \hline
+         \xrowht{30pt}   UC006B  & Hiển thị trạng thái bãi xe và điều hướng người dùng & Người dùng, nhân viên hoặc thiết bị hiển thị xem trạng thái bãi xe đã được cập nhật và nhận đề xuất khu vực đỗ phù hợp.\\  \hline 
         \xrowht{30pt}   UC007   & Cấu hình chính sách giá và quyền lợi gửi xe      & Quản trị viên thiết lập hoặc điều chỉnh chính sách giá và quyền lợi gửi xe cho từng nhóm người dùng. \\ \hline
 
           \xrowht{30pt}   UC008   & Thống kê và xuất báo cáo & Quản trị viên hoặc nhân viên xem và xuất báo cáo thống kê về lượt gửi xe, doanh thu và tình trạng bãi xe. \\  \hline 
@@ -350,10 +364,13 @@ Các hệ thống tích hợp để hỗ trợ hoạt động của hệ thống
 
 \newpage
 
-\ssssection{Bảng mô tả usecase Kiểm tra và điều hướng trạng thái bãi xe}
+\ssssection{Bảng mô tả usecase Cập nhật dữ liệu trạng thái bãi xe từ IoT Gateway}
 
+\input{Contents/Main/usecase/6a-capnhatdulieuiot}
 
-\input{Contents/Main/usecase/6-kiemtravadieuhuong}
+\ssssection{Bảng mô tả usecase Hiển thị trạng thái bãi xe và điều hướng người dùng}
+
+\input{Contents/Main/usecase/6b-hienthivadieuhuong}
 
 % \newpage
 

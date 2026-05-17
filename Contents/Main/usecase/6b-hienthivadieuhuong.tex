@@ -1,0 +1,63 @@
+\begin{center}
+\begin{longtable}{|m{2.7cm}|m{12.8cm}|}
+\hline
+ID Use-case  & UC006B \\ 
+Name Use-case & Hiển thị trạng thái bãi xe và điều hướng người dùng \\ 
+\hline
+Actors & Primary actors: Người dùng nội bộ, Khách vãng lai, Nhân viên. Supporting actors: Hệ thống Smart Parking, Giao diện hiển thị (bảng điện tử, kiosk, web/mobile UI).\\
+\hline
+Description & Use case này mô tả phần người dùng hoặc nhân viên xem trạng thái bãi xe và nhận đề xuất khu vực đỗ phù hợp. Use case sử dụng dữ liệu trạng thái đã được cập nhật bởi UC006A, không trực tiếp xử lý dữ liệu cảm biến thô.\\
+\hline
+Trigger & Người dùng hoặc nhân viên mở chức năng kiểm tra trạng thái bãi xe, hoặc bảng điện tử/kiosk yêu cầu dữ liệu hiển thị mới.\\
+\hline
+Preconditions & 
+1. Người dùng hoặc thiết bị hiển thị có thể truy cập hệ thống.
+
+2. Hệ thống có dữ liệu trạng thái bãi xe hiện tại hoặc dữ liệu gần nhất còn hiệu lực từ UC006A.
+
+3. Quy tắc phân khu, ưu tiên theo vai trò và khu vực thay thế đã được cấu hình.\\
+\hline
+Post conditions & 
+1. Người dùng hoặc nhân viên xem được trạng thái hiện tại của các khu vực trong bãi xe.
+
+2. Hệ thống đưa ra khu vực đề xuất hoặc thông báo hết chỗ nếu không còn khu vực phù hợp.
+
+3. Hệ thống ghi nhận yêu cầu tra cứu/điều hướng để phục vụ thống kê.\\
+\hline
+Normal flow & 
+1. Người dùng, nhân viên hoặc thiết bị hiển thị gửi yêu cầu xem trạng thái bãi xe.
+
+2. Hệ thống truy xuất trạng thái khu vực và thời điểm cập nhật gần nhất từ cơ sở dữ liệu nội bộ.
+
+3. Hệ thống kiểm tra dữ liệu có còn hiệu lực để hiển thị hay không.
+
+4. Hệ thống hiển thị trạng thái các khu vực: còn chỗ, gần đầy, đầy hoặc không xác định.
+
+5. Hệ thống xác định loại người dùng hoặc ngữ cảnh truy cập để áp dụng quy tắc ưu tiên.
+
+6. Hệ thống chọn khu vực phù hợp dựa trên số chỗ trống, vai trò người dùng và chính sách ưu tiên.
+
+7. Giao diện hiển thị khu vực đề xuất và hướng dẫn di chuyển phù hợp với kênh hiển thị.
+
+8. Người dùng tiếp nhận thông tin và di chuyển theo hướng dẫn.\\
+\hline
+Alternative flow & 
+A1. Nếu khu vực ưu tiên gần đầy hoặc hết chỗ, hệ thống đề xuất khu vực thay thế còn nhiều chỗ hơn.
+
+A2. Nếu nhân viên truy cập chế độ giám sát, hệ thống hiển thị chi tiết theo khu, cụm cảm biến hoặc từng chỗ đỗ.
+
+A3. Nếu yêu cầu đến từ bảng điện tử tại cổng, hệ thống chỉ hiển thị khu vực đề xuất và chỉ dẫn ngắn gọn thay vì bản đồ chi tiết.
+
+A4. Nếu người dùng chỉ muốn xem thông tin mà không cần điều hướng, hệ thống dừng ở bước hiển thị trạng thái khu vực.\\ 
+\hline
+Exception flow & 
+E1. Nếu dữ liệu trạng thái đã quá hạn, hệ thống vẫn hiển thị dữ liệu gần nhất nhưng kèm cảnh báo dữ liệu có thể bị trễ.
+
+E2. Nếu toàn bộ bãi xe đã đầy, hệ thống hiển thị trạng thái hết chỗ và không đưa ra điều hướng vào khu vực đỗ xe.
+
+E3. Nếu khu vực được chọn đang ở trạng thái không xác định, hệ thống không điều hướng người dùng vào khu vực đó và chọn khu vực thay thế nếu có.
+
+E4. Nếu giao diện hiển thị hoặc bảng điện tử không phản hồi, hệ thống ghi log lỗi và thông báo cho nhân viên kiểm tra thiết bị.\\
+\hline
+\end{longtable}
+\end{center}

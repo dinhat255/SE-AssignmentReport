@@ -1,0 +1,30 @@
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        font=\small,
+        lifeline/.style={draw, rounded corners, fill=blue!8, minimum width=2.8cm, minimum height=0.8cm},
+        msg/.style={->, >=stealth},
+        note/.style={draw, rounded corners, fill=yellow!15, align=center}
+    ]
+        \node[lifeline] (user) at (0,0) {Người dùng/Nhân viên};
+        \node[lifeline] (ui) at (4.2,0) {Giao diện hiển thị};
+        \node[lifeline] (system) at (8.4,0) {Hệ thống Smart Parking};
+        \node[lifeline] (db) at (12.6,0) {CSDL nội bộ};
+
+        \foreach \x in {0,4.2,8.4,12.6} {
+            \draw[dashed] (\x,-0.45) -- (\x,-7.7);
+        }
+
+        \draw[msg] (0,-1.0) -- node[above]{Yêu cầu xem trạng thái bãi xe} (4.2,-1.0);
+        \draw[msg] (4.2,-1.6) -- node[above]{requestParkingStatus()} (8.4,-1.6);
+        \draw[msg] (8.4,-2.2) -- node[above]{Truy xuất trạng thái đã cập nhật từ UC006A} (12.6,-2.2);
+        \draw[msg, dashed] (12.6,-2.8) -- node[above]{Trạng thái khu vực, thời điểm cập nhật} (8.4,-2.8);
+        \draw[msg] (8.4,-3.4) -- node[above]{Kiểm tra hiệu lực dữ liệu} (8.4,-4.0);
+        \draw[msg] (8.4,-4.5) -- node[above]{Chọn khu vực phù hợp theo vai trò/chỗ trống} (8.4,-5.1);
+        \draw[msg, dashed] (8.4,-5.6) -- node[above]{Trạng thái và đề xuất điều hướng} (4.2,-5.6);
+        \draw[msg, dashed] (4.2,-6.2) -- node[above]{Hiển thị bản đồ/chỉ dẫn/khu vực đề xuất} (0,-6.2);
+
+        \node[note, text width=4.6cm] at (8.4,-7.1) {Nếu dữ liệu trễ hoặc bãi xe đầy: hiển thị cảnh báo và không điều hướng vào khu vực không phù hợp};
+    \end{tikzpicture}
+    \caption{Sequence diagram cho UC006B - Hiển thị trạng thái bãi xe và điều hướng người dùng}
+\end{figure}
